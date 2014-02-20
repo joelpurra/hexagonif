@@ -8,10 +8,6 @@ var start = new Date().valueOf(),
     path = require('path'),
     size = require('gulp-size'),
 
-    watchLogger = function(event) {
-        console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
-    },
-
     paths = {
         input: {
             html: 'src/*.html',
@@ -27,6 +23,8 @@ var start = new Date().valueOf(),
             css: 'dist/public/resources/css/'
         }
     },
+
+    refresh,
 
     options = {
         express: {
@@ -54,7 +52,8 @@ gulp.task('clean', function() {
 gulp.task('html', function() {
     gulp.src(paths.input.html)
         .pipe(size(options.size))
-        .pipe(gulp.dest(paths.output.html));
+        .pipe(gulp.dest(paths.output.html))
+        .pipe(refresh());
 });
 
 gulp.task('javascript', function() {
@@ -70,7 +69,8 @@ gulp.task('javascript', function() {
         .pipe(concat('main.js'))
         .pipe(uglify())
         .pipe(size(options.size))
-        .pipe(gulp.dest(paths.output.javascript));
+        .pipe(gulp.dest(paths.output.javascript))
+        .pipe(refresh());
 });
 
 gulp.task('css', function() {
@@ -80,7 +80,8 @@ gulp.task('css', function() {
         .pipe(size(options.size))
         .pipe(styl())
         .pipe(size(options.size))
-        .pipe(gulp.dest(paths.output.css));
+        .pipe(gulp.dest(paths.output.css))
+        .pipe(refresh());
 });
 
 gulp.task('json', function() {
@@ -90,14 +91,20 @@ gulp.task('json', function() {
         .pipe(size(options.size))
         .pipe(stripJsonComments())
         .pipe(size(options.size))
-        .pipe(gulp.dest(paths.output.json));
+        .pipe(gulp.dest(paths.output.json))
+        .pipe(refresh());
 });
 
 gulp.task('server', function() {
     var livereloadServer = require('tiny-lr')(),
         express = require('express'),
         livereloadClient = require('connect-livereload')(),
-        app = express();
+        app = express(),
+        livereload = require('gulp-livereload');
+
+    refresh = function() {
+        return livereload(livereloadServer);
+    };
 
     livereloadServer.listen(35729, function(err) {
         if (err) {
@@ -122,15 +129,13 @@ gulp.task('open', function() {
 });
 
 gulp.task('default', ['clean', 'server', 'html', 'javascript', 'json', 'css'], function() {
-    gulp.watch(paths.input.html, ['html'])
-        .on('change', watchLogger);
+    var tasks = ['html', 'javascript', 'json', 'css'],
+        changeLogger = function(event) {
+            console.log('File ' + event.path + ' was ' + event.type + ', running task...');
+        };
 
-    gulp.watch(paths.input.javascript, ['javascript'])
-        .on('change', watchLogger);
-
-    gulp.watch(paths.input.json, ['json'])
-        .on('change', watchLogger);
-
-    gulp.watch(paths.input.css, ['css'])
-        .on('change', watchLogger);
+    tasks.forEach(function(task) {
+        gulp.watch(paths.input[task], [task])
+            .on('change', changeLogger);
+    });
 });
