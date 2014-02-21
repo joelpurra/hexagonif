@@ -9,6 +9,8 @@
     canvasElement.width = 800;
     canvasElement.height = 1200;
 
+    var canvasArea = new Point(canvasElement.width, canvasElement.height);
+
     var canvas = oCanvas.create({
         canvas: "#hexagonif"
     });
@@ -26,6 +28,111 @@
 
         return this;
     }
+
+    Point.prototype.getCacheKey = function() {
+        var x = this.x.toFixed(20),
+            y = this.y.toFixed(20),
+            result = x + ", " + y;
+
+        return result;
+    };
+
+    function Line(start, end) {
+        this.start = start;
+        this.end = end;
+
+        return this;
+    }
+
+    Line.prototype.getCacheKey = function() {
+        var start = this.start.getCacheKey(20),
+            end = this.end.getCacheKey(20),
+            result = start + "-" + end;
+
+        return result;
+    };
+
+    var Corner = function(name, rotation) {
+        this.name = name;
+        this.rotation = rotation;
+
+        return this;
+    }
+
+        function Hexagon(topLeft) {
+            this.topLeft = topLeft || null;
+            this.topRight = null;
+            this.right = null;
+            this.bottomRight = null;
+            this.bottomLeft = null;
+            this.left = null;
+        }
+
+    Hexagon.Corners = {
+        TopLeft: new Corner("top left", 120),
+        TopRight: new Corner("topRight", 60),
+        Right: new Corner("right", 0),
+        BottomRight: new Corner("bottom right", 300),
+        BottomLeft: new Corner("bottom left", 240),
+        Left: new Corner("left", 180)
+    };
+
+    Hexagon.Corners.next = function(start) {
+        switch (start) {
+            case Hexagon.Corners.TopLeft:
+                return Hexagon.Corners.TopRight;
+
+            case Hexagon.Corners.TopRight:
+                return Hexagon.Corners.Right;
+
+            case Hexagon.Corners.Right:
+                return Hexagon.Corners.BottomRight;
+
+            case Hexagon.Corners.BottomRight:
+                return Hexagon.Corners.BottomLeft;
+
+            case Hexagon.Corners.BottomLeft:
+                return Hexagon.Corners.Left;
+
+            case Hexagon.Corners.Left:
+                return Hexagon.Corners.TopLeft;
+        }
+
+        throw new Error("Unknown start corner " + start);
+    };
+
+    Hexagon.prototype.getCacheKey = function() {
+        return this.topLeft.getCacheKey();
+    };
+
+    Hexagon.prototype.nodes = function() {
+        return [this.topLeft, this.topRight, this.right, this.bottomRight, this.bottomLeft, this.left];
+    };
+
+    Hexagon.prototype.setCornerPoint = function(corner, point) {
+        switch (corner) {
+            case Hexagon.Corners.TopLeft:
+                this.topLeft = point;
+                break;
+            case Hexagon.Corners.TopRight:
+                this.topRight = point;
+                break;
+            case Hexagon.Corners.Right:
+                this.right = point;
+                break;
+            case Hexagon.Corners.BottomRight:
+                this.bottomRight = point;
+                break;
+            case Hexagon.Corners.BottomLeft:
+                this.bottomLeft = point;
+                break;
+            case Hexagon.Corners.Left:
+                this.left = point;
+                break;
+            default:
+                throw new Error("Unknown corner " + corner);
+        }
+    };
 
     function draw(start, end) {
         var line = linePrototype.clone({
@@ -53,11 +160,11 @@
             });
     }
 
-    function drawHexagonsLines(start, depth, size) {
+    function drawHexagonsLines(start, depth, area) {
         var angle,
             end;
 
-        if (start.x > size.x || start.y > size.y) {
+        if (start.x > area.x || start.y > area.y) {
             return;
         }
 
@@ -74,11 +181,75 @@
 
         draw(start, end);
 
-        drawHexagonsLines(end, depth + 1, size);
+        drawHexagonsLines(end, depth + 1, area);
     }
 
-    var size = new Point(canvasElement.width, canvasElement.height);
+    function getOrGenerateHexagon(area, hexagons, nodes, lines, side, startPoint, startCorner) {
+        var hexHash = startPoint.getCacheKey();
 
-    drawHexagonsLines(new Point(0, 0), 0, size);
-    drawHexagonsLines(new Point(hexagonSideLength - 45, -hexagonSideLength), 1, size);
+        if (hexagons[hexHash] !== undefined) {
+            return hexagons[hexHash];
+        }
+
+        var hexagon = new Hexagon();
+
+        var point = startPoint,
+            corner = startCorner;
+
+        do {
+            var cachedPoint = nodes[point.getCacheKey()];
+
+            if (!cachedPoint) {
+                nodes[point.getCacheKey()] = point;
+            } else {
+                point = cachedPoint;
+            }
+
+            hexagon.setCornerPoint(corner, point);
+
+            var nextCorner = Hexagon.Corners.next(corner);
+            var angle = ((nextCorner.rotation - startCorner.rotation) / 180) * Math.PI;
+            var nextPoint = new Point(point.x + hexagonSideLength * Math.cos(angle), point.y + hexagonSideLength * Math.sin(angle));
+
+            var line = new Line(point, nextPoint);
+
+            var cachedLine = lines[line.getCacheKey()];
+
+            if (!cachedLine) {
+                lines[line.getCacheKey()] = line;
+            } else {
+                line = cachedLine;
+            }
+
+            point = nextPoint;
+            corner = nextCorner;
+
+            // TODO: fix equality check
+        } while (corner.rotation !== startCorner.rotation)
+
+        hexagons[hexHash] = hexagon;
+
+        return hexagon;
+    }
+
+    var hexagons = [],
+        nodes = [],
+        lines = [],
+        hexagon = getOrGenerateHexagon(canvasArea, hexagons, nodes, lines, hexagonSideLength, new Point(300, 300), Hexagon.Corners.TopLeft);
+
+    console.log("hexagons", hexagons, "nodes", nodes, "lines", lines, "hexagon", hexagon);
+
+    // Object.keys(nodes).sort().reduce(function(start, end) {
+    //     draw(nodes[start], nodes[end]);
+
+    //     return end;
+    // });
+    Object.keys(lines).sort().forEach(function(cacheKey) {
+        var line = lines[cacheKey];
+
+        draw(line.start, line.end);
+    });
+
+    // drawHexagonsLines(new Point(0, 0), 0, canvasArea);
+    // drawHexagonsLines(new Point(hexagonSideLength - 45, -hexagonSideLength), 1, canvasArea);
 }());
