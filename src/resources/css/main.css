@@ -1,1 +1,15 @@
-/* PLACEHOLDER */
+body {
+    padding-left: 10%;
+    padding-right: 10%;
+
+    height: 2000px;
+    width: 100%;
+}
+canvas {
+	display: block;
+}
+#hexagonif {
+    width: 500px;
+    height: 1200px;
+    border: 1px solid lightgrey;
+}
