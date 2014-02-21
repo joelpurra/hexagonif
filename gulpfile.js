@@ -60,17 +60,22 @@ gulp.task('javascript', function() {
     var stripDebug = require('gulp-strip-debug'),
         uglify = require('gulp-uglify'),
         browserify = require('gulp-browserify'),
-        concat = require('gulp-concat');
+        concat = require('gulp-concat'),
+        rename = require('gulp-rename');
 
     gulp.src(paths.input.javascript)
-        .pipe(stripDebug())
         .pipe(size(options.size))
         .pipe(browserify())
-        .pipe(concat('main.js'))
-        .pipe(uglify())
         .pipe(size(options.size))
+        .pipe(concat('main.js'))
         .pipe(gulp.dest(paths.output.javascript))
-        .pipe(refresh());
+        .pipe(refresh())
+        .pipe(stripDebug())
+        .pipe(size(options.size))
+        .pipe(uglify())
+        .pipe(rename('main.min.js'))
+        .pipe(size(options.size))
+        .pipe(gulp.dest(paths.output.javascript));
 });
 
 gulp.task('css', function() {
