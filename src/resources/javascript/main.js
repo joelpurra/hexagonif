@@ -6,51 +6,79 @@
     // TODO: use hidpi-canvas-polyfill
     // https://github.com/jondavidjohn/hidpi-canvas-polyfill
     var canvasElement = document.getElementById("hexagonif");
-    canvasElement.width = 500;
+    canvasElement.width = 800;
     canvasElement.height = 1200;
 
-    var FPS = 60 / 3,
-        initialRadius = 100,
-        acceptableDifference = 0.01;
-
     var canvas = oCanvas.create({
-        canvas: "#hexagonif",
-        fps: FPS
+        canvas: "#hexagonif"
     });
 
-    var hexagon = canvas.display.polygon({
-        radius: initialRadius,
-        sides: 6,
-        x: canvas.width / 2,
-        y: canvas.height / 3,
-        fill: "#29b"
+    var hexagonSideLength = 100;
+
+    var linePrototype = canvas.display.line({
+        cap: "round",
+        stroke: "5px radial-gradient(center, center, 50% width, rgba(0,0,0,0.1), rgba(0,0,0,0.3))",
     });
 
-    canvas.addChild(hexagon);
+    function Point(x, y) {
+        this.x = x;
+        this.y = y;
 
-    var defaultResetPeriod = FPS * 1,
-        defaultResetCycles = defaultResetPeriod * 10,
-        resetCycles = defaultResetCycles;
+        return this;
+    }
 
-    canvas.setLoop(function() {
-        if (resetCycles <= 0) {
-            var adjustment = ((1 - (hexagon.radius / initialRadius)) * initialRadius) / defaultResetPeriod;
-
-            hexagon.radius += adjustment;
-
-            var diff = initialRadius - hexagon.radius;
-
-            if (Math.abs(diff) < initialRadius * acceptableDifference) {
-                resetCycles = defaultResetCycles;
+    function draw(start, end) {
+        var line = linePrototype.clone({
+            start: {
+                x: start.x,
+                y: start.y
+            },
+            end: {
+                x: end.x,
+                y: end.y
             }
+        });
+
+        canvas.addChild(line);
+
+        line
+            .bind("mouseenter", function(event) {
+                this.stroke = "10px #f0f";
+                this.zIndex = "front";
+                this.redraw();
+            })
+            .bind("mouseleave", function(event) {
+                this.stroke = "5px #ff0";
+                this.redraw();
+            });
+    }
+
+    function drawHexagonsLines(start, depth, size) {
+        var angle,
+            end;
+
+        if (start.x > size.x || start.y > size.y) {
+            return;
         }
 
-        hexagon.radius *= 1 + (0.2 * (0.5 - (Math.round(Math.random()))));
+        if (depth % 2) {
+            end = new Point(start.x + hexagonSideLength, start.y);
 
-        hexagon.rotation++;
+            angle = (120 / 180) * Math.PI;
+            draw(start, new Point(start.x + hexagonSideLength * Math.cos(angle), start.y + hexagonSideLength * Math.sin(angle)));
+        } else {
+            angle = (60 / 180) * Math.PI;
 
-        resetCycles = (resetCycles - 1) % defaultResetCycles;
-    });
+            end = new Point(start.x + hexagonSideLength * Math.cos(angle), start.y + hexagonSideLength * Math.sin(angle));
+        }
 
-    canvas.timeline.start();
+        draw(start, end);
+
+        drawHexagonsLines(end, depth + 1, size);
+    }
+
+    var size = new Point(canvasElement.width, canvasElement.height);
+
+    drawHexagonsLines(new Point(0, 0), 0, size);
+    drawHexagonsLines(new Point(hexagonSideLength - 45, -hexagonSideLength), 1, size);
 }());
