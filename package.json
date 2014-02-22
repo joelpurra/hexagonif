@@ -12,7 +12,6 @@
         "gulp": "~3.5.2",
         "gulp-browserify": "~0.4.6",
         "gulp-clean": "~0.2.4",
-        "gulp-concat": "~2.1.7",
         "gulp-livereload": "~1.1.1",
         "gulp-open": "~0.2.8",
         "gulp-rename": "^1.1.0",

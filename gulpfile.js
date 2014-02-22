@@ -10,8 +10,9 @@ var start = new Date().valueOf(),
 
     paths = {
         input: {
+            main: 'src/resources/javascript/main.js',
             html: 'src/*.html',
-            javascript: 'src/resources/javascript/*.js',
+            javascript: 'src/resources/javascript/**/*.js',
             json: 'src/resources/json/*.json',
             css: 'src/resources/css/*.css'
         },
@@ -60,22 +61,31 @@ gulp.task('javascript', function() {
     var stripDebug = require('gulp-strip-debug'),
         uglify = require('gulp-uglify'),
         browserify = require('gulp-browserify'),
-        concat = require('gulp-concat'),
         rename = require('gulp-rename');
 
-    gulp.src(paths.input.javascript)
+    gulp.src(paths.input.main)
+        .pipe(size(options.size))
+        .pipe(stripDebug())
         .pipe(size(options.size))
         .pipe(browserify())
-        .pipe(size(options.size))
-        .pipe(concat('main.js'))
-        .pipe(gulp.dest(paths.output.javascript))
-        .pipe(refresh())
-        .pipe(stripDebug())
         .pipe(size(options.size))
         .pipe(uglify())
         .pipe(rename('main.min.js'))
         .pipe(size(options.size))
         .pipe(gulp.dest(paths.output.javascript));
+
+    gulp.src(paths.input.main)
+        .pipe(size(options.size))
+        .pipe(browserify({
+            debug: true
+        }))
+        .pipe(size(options.size))
+        .pipe(gulp.dest(paths.output.javascript));
+
+    gulp.src(paths.input.javascript)
+        .pipe(size(options.size))
+        .pipe(refresh());
+
 });
 
 gulp.task('css', function() {
