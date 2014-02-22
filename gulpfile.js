@@ -13,6 +13,7 @@ var start = new Date().valueOf(),
             main: 'src/resources/javascript/main.js',
             html: 'src/*.html',
             javascript: 'src/resources/javascript/**/*.js',
+            libraries: 'src/resources/javascript/libraries/**/*.js',
             json: 'src/resources/json/*.json',
             css: 'src/resources/css/*.css'
         },
@@ -20,6 +21,7 @@ var start = new Date().valueOf(),
             clean: 'dist/**',
             html: 'dist/public/',
             javascript: 'dist/public/resources/javascript/',
+            libraries: 'dist/public/resources/javascript/libraries/',
             json: 'dist/public/resources/json/',
             css: 'dist/public/resources/css/'
         }
@@ -86,6 +88,9 @@ gulp.task('javascript', function() {
         .pipe(size(options.size))
         .pipe(refresh());
 
+    gulp.src(paths.input.libraries)
+        .pipe(size(options.size))
+        .pipe(gulp.dest(paths.output.libraries));
 });
 
 gulp.task('css', function() {
