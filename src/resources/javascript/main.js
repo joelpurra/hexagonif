@@ -3,24 +3,26 @@
 
     var Point = require("./modules/point.js"),
         Line = require("./modules/line.js"),
-        Hexagon = require("./modules/hexagon.js");
+        Hexagon = require("./modules/hexagon.js"),
+        profiling = require("./modules/profiling.js");
 
     var BASE = 10;
 
-    function renderer(canvasArea, lines) {
+    function renderer(canvasId, canvasArea, lines) {
         // TODO: use hidpi-canvas-polyfill
         // https://github.com/jondavidjohn/hidpi-canvas-polyfill
-        var canvasElement = document.getElementById("hexagonif");
+        var canvasElement = document.getElementById(canvasId);
         canvasElement.width = canvasArea.x;
         canvasElement.height = canvasArea.y;
 
         var canvas = oCanvas.create({
-            canvas: "#hexagonif"
+            canvas: "#" + canvasId
         });
 
         var linePrototype = canvas.display.line({
             cap: "round",
-            stroke: "5px radial-gradient(center, center, 50% width, rgba(0,0,0,0.1), rgba(0,0,0,0.3))",
+            //stroke: "5px radial-gradient(center, center, 50% width, rgba(0,0,0,0.1), rgba(0,0,0,0.3))",
+            stroke: "5px rgba(0,0,0,0.1)",
         });
 
         function lineHighlight(event) {
@@ -166,9 +168,15 @@
     function run() {
         var canvasArea = new Point(800, 1200),
             hexagonSideLength = 100,
-            lines = grapher(canvasArea, hexagonSideLength);
+            profiledGrapher = profiling.wrap("grapher", function() {
+                return grapher(canvasArea, hexagonSideLength);
+            }),
+            lines = profiledGrapher(),
+            profiledRenderer = profiling.wrap("renderer", function() {
+                return renderer("hexagonif", canvasArea, lines);
+            });
 
-        renderer(canvasArea, lines);
+        profiledRenderer();
     }
 
     run();
