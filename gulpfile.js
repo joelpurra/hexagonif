@@ -43,10 +43,10 @@ var start = new Date().valueOf(),
 
 console.log('Loading took ' + (stop - start) + ' ms.');
 
-gulp.task('clean', function() {
+gulp.task('clean', function(done) {
     var clean = require('gulp-clean');
 
-    gulp.src(paths.output.clean, {
+    return gulp.src(paths.output.clean, {
         read: false
     })
         .pipe(clean());
@@ -116,7 +116,9 @@ gulp.task('json', function() {
 });
 
 gulp.task('server', function() {
-    var livereloadServer = require('tiny-lr')(),
+    var Q = require('q'),
+        deferred = Q.defer(),
+        livereloadServer = require('tiny-lr')(),
         express = require('express'),
         livereloadClient = require('connect-livereload')(),
         app = express(),
@@ -134,21 +136,29 @@ gulp.task('server', function() {
 
     app.use(livereloadClient);
     app.use(express.static(options.express.root));
-    app.listen(options.express.port);
+    app.listen(options.express.port, function(error) {
+        if (error) {
+            deferred.reject(error);
+        } else {
+            deferred.resolve();
+        }
+    });
+
+    return deferred.promise;
 });
 
-gulp.task('open', function() {
+gulp.task('open', ['server'], function() {
     var open = require('gulp-open'),
         url = 'http://localhost:' + options.express.port + '/';
 
     // Any file that exists will do
-    gulp.src('gulpfile.js')
+    return gulp.src('gulpfile.js')
         .pipe(open('', {
             url: url
         }));
 });
 
-gulp.task('default', ['clean', 'server', 'html', 'javascript', 'json', 'css'], function() {
+gulp.task('watch', ['server'], function() {
     var tasks = ['html', 'javascript', 'json', 'css'],
         changeLogger = function(event) {
             console.log('File ' + event.path + ' was ' + event.type + ', running task...');
@@ -159,3 +169,5 @@ gulp.task('default', ['clean', 'server', 'html', 'javascript', 'json', 'css'], f
             .on('change', changeLogger);
     });
 });
+
+gulp.task('default', ['clean', 'server', 'html', 'javascript', 'json', 'css', 'watch']);

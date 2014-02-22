@@ -20,6 +20,7 @@
         "gulp-strip-json-comments": "~0.1.1",
         "gulp-styl": "~0.2.0",
         "gulp-uglify": "~0.2.1",
-        "tiny-lr": "0.0.5"
+        "tiny-lr": "0.0.5",
+        "q": "^1.0.0"
     }
 }
