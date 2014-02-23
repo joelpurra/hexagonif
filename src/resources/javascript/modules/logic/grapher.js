@@ -1,7 +1,8 @@
 var Point = require("../objects/point.js"),
     Line = require("../objects/line.js"),
     Hexagon = require("../objects/hexagon.js"),
-    limitPrecision = require("../utils/limit-precision.js");
+    limitPrecision = require("../utils/limit-precision.js"),
+    random = require("../utils/random.js");
 
 function grapher(canvasArea, hexagonSideLength) {
     var countdown = 1000;
@@ -87,7 +88,7 @@ function grapher(canvasArea, hexagonSideLength) {
     var hexagons = [],
         nodes = [],
         lines = [],
-        startInCanvas = new Point(Math.floor(Math.random() * canvasArea.x), Math.floor(Math.random() * canvasArea.y))
+        startInCanvas = new Point(random.integer(canvasArea.x), random.integer(canvasArea.y))
         graph = getOrGenerateHexagon(canvasArea, hexagons, nodes, lines, hexagonSideLength, startInCanvas, Hexagon.Corners.BottomLeft, 0);
 
     return lines;

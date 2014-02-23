@@ -1,4 +1,6 @@
 function renderer(canvasId, canvasArea, lines) {
+    var random = require("../utils/random.js");
+
     // TODO: use hidpi-canvas-polyfill
     // https://github.com/jondavidjohn/hidpi-canvas-polyfill
     var canvasElement = document.getElementById(canvasId);
@@ -11,23 +13,22 @@ function renderer(canvasId, canvasArea, lines) {
 
     var linePrototype = canvas.display.line({
         cap: "round",
-        //stroke: "5px radial-gradient(center, center, 50% width, rgba(0,0,0,0.1), rgba(0,0,0,0.3))",
-        strokeWidth: 10,
+        strokeWidth: random.integer(1, 10),
         strokeColor: "rgba(0, 0, 0, 0.1)",
     });
 
     function lineHighlight(event) {
-        this.strokeColor = "rgba(255, 0, 255, 0.5)";
+        this.strokeColor = "rgba(255, 0, 0, 0.7)";
         this.zIndex = "front";
         this.redraw();
     }
 
     function lineUnhighlight(event) {
-        this.strokeColor = "rgba(255, 255, 0, 0.5)";
+        this.strokeColor = "rgba(255, 0, 0, 0.3)";
         this.redraw();
     }
 
-    function draw(scene, start, end) {
+    function draw(scene, start, end, tag) {
         var line = linePrototype.clone({
             start: {
                 x: start.x,
@@ -36,7 +37,8 @@ function renderer(canvasId, canvasArea, lines) {
             end: {
                 x: end.x,
                 y: end.y
-            }
+            },
+            tag: tag
         });
 
         scene.add(line);
@@ -52,7 +54,7 @@ function renderer(canvasId, canvasArea, lines) {
         var scene = this;
 
         // Object.keys(nodes).sort().reduce(function(start, end) {
-        //     draw(scene, nodes[start], nodes[end]);
+        //     draw(scene, nodes[start], nodes[end], node);
 
         //     return end;
         // });
@@ -60,7 +62,7 @@ function renderer(canvasId, canvasArea, lines) {
         Object.keys(lines).forEach(function(cacheKey) {
             var line = lines[cacheKey];
 
-            draw(scene, line.start, line.end);
+            draw(scene, line.start, line.end, line);
         });
     });
 
