@@ -8,8 +8,8 @@ function Line(start, end) {
 }
 
 Line.prototype.getCacheKey = function() {
-    var start = this.start.getCacheKey(20),
-        end = this.end.getCacheKey(20),
+    var start = this.start.getCacheKey(),
+        end = this.end.getCacheKey(),
         result;
 
     if (start < end) {
@@ -17,6 +17,14 @@ Line.prototype.getCacheKey = function() {
     } else {
         result = end + "-" + start
     }
+
+    return result;
+};
+
+Line.prototype.center = function() {
+    var x = (this.start.x + this.end.x) / 2,
+        y = (this.start.y + this.end.y) / 2,
+        result = new Point(x, y);
 
     return result;
 };

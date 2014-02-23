@@ -1,5 +1,8 @@
 var Corner = require("./corner.js"),
-    CornerPoint = require("./cornerpoint.js");
+    CornerPoint = require("./cornerpoint.js"),
+    Line = require("./line.js");
+
+var NUMBER_OF_SIDES = 6;
 
 function Hexagon() {
     this.topLeft = null;
@@ -125,13 +128,60 @@ Hexagon.Corners.connecting = function(start) {
 };
 
 Hexagon.prototype.getCacheKey = function() {
-    // TODO: return just the top left corner?
-    return this.topLeft.getCacheKey();
+    var centerCacheKey,
+        hexagon = this;
+
+    this.cornerPoints().slice(0, 2).some(function(cornerPoint) {
+        var oppositeCorner = !! cornerPoint && Hexagon.Corners.opposite(cornerPoint.corner),
+            oppositeCornerPoint = !! oppositeCorner && hexagon.getCornerPoint(oppositeCorner),
+            line = oppositeCornerPoint && new Line(cornerPoint.point, oppositeCornerPoint.point),
+            center = line && line.center();
+
+        centerCacheKey = center && center.getCacheKey();
+
+        if (centerCacheKey) {
+            return true;
+        }
+
+        return false;
+    });
+
+    return centerCacheKey || null;
+};
+
+Hexagon.prototype.cornerCount = function() {
+    // TODO: get a library that has .count()
+    var count = this.cornerPoints().reduce(function(prev, cornerPoint) {
+        return prev + (cornerPoint === undefined ? 0 : 1);
+    }, 0);
+
+    return count;
+};
+
+Hexagon.prototype.isComplete = function() {
+    return this.cornerCount() === NUMBER_OF_SIDES;
 };
 
 Hexagon.prototype.cornerPoints = function() {
     return [this.topLeft, this.topRight, this.right, this.bottomRight, this.bottomLeft, this.left];
 };
+
+Hexagon.prototype.getCornerPoint = function(corner) {
+    var result = null;
+
+    this.cornerPoints().some(function(cornerPoint) {
+        // TODO: fix equality check
+        if (cornerPoint.corner.rotation === corner.rotation) {
+            result = cornerPoint;
+            return true;
+        }
+
+        return false;
+    });
+
+    return result;
+};
+
 
 Hexagon.prototype.setCornerPoint = function(corner, point) {
     var cornerPoint = new CornerPoint(corner, point);
