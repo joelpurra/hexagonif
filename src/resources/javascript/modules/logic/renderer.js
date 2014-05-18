@@ -11,20 +11,41 @@ function renderer(canvasId, canvasArea, lines) {
         canvas: "#" + canvasId
     });
 
+    function getDefaultStrokeWidth() {
+        // TODO: move to options object
+        return 10;
+        // return random.integer(1, 10);
+    }
+
+    function getDefaultStrokeColor() {
+        // TODO: move to options object
+        return "rgba(0, 0, 0, 0.01)";
+        // return "transparent";
+    }
+
+    function getColorByLocation(x, y, highlight) {
+        var byY = Math.floor((y / canvasArea.y) * 360),
+            // TODO: move to options object
+            opacity = highlight ? 0.7 : 0.3;
+
+        return "hsla(" + byY + ", 100%, 50%, " + opacity.toFixed(3) + ")";
+        // return "hsla(60, 100%, 50%, 0.3)";
+    }
+
     var linePrototype = canvas.display.line({
         cap: "round",
-        strokeWidth: random.integer(1, 10),
-        strokeColor: "rgba(0, 0, 0, 0.1)",
+        strokeWidth: getDefaultStrokeWidth(),
+        strokeColor: getDefaultStrokeColor(),
     });
 
     function lineHighlight(event) {
-        this.strokeColor = "rgba(255, 0, 0, 0.7)";
+        this.strokeColor = getColorByLocation(this.x, this.y, true);
         this.zIndex = "front";
         this.redraw();
     }
 
     function lineUnhighlight(event) {
-        this.strokeColor = "rgba(255, 0, 0, 0.3)";
+        this.strokeColor = getColorByLocation(this.x, this.y, false);
         this.redraw();
     }
 
