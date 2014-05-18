@@ -73,6 +73,19 @@
         profiledRenderer();
     }
 
+    function onMouseDetector(callback) {
+        var hoverDetected = false,
+            hoverDetectorFunction = function() {
+                if (!hoverDetected) {
+                    hoverDetected = true;
+                    document.removeEventListener("mouseover", hoverDetectorFunction);
+                    callback.call();
+                }
+            };
+
+        document.addEventListener("mouseover", hoverDetectorFunction);
+    }
+
     var run = oneAtATimePlease(generateAndRender);
 
     window.addEventListener("resize", function() {
@@ -85,5 +98,5 @@
         }
     });
 
-    run();
+    onMouseDetector(run);
 }());
