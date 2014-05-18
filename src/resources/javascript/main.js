@@ -49,10 +49,19 @@
         return wrapper;
     }
 
+    function calculateHexagonSideLength() {
+        var canvas = getCanvas(),
+            shortestCanvasSide = Math.min(canvas.scrollWidth, canvas.scrollHeight),
+            min = shortestCanvasSide / 20,
+            max = shortestCanvasSide / 10;
+
+        return random.integer(min, max);
+    }
+
     function generateAndRender() {
         var canvas = createCanvas(),
             canvasArea = new Point(canvas.scrollWidth, canvas.scrollHeight),
-            hexagonSideLength = random.integer(30, 100),
+            hexagonSideLength = calculateHexagonSideLength(),
             profiledGrapher = profiling.wrap("grapher", function() {
                 return grapher(canvasArea, hexagonSideLength);
             }),
