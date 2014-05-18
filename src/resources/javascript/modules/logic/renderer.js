@@ -19,8 +19,8 @@ function renderer(canvasId, canvasArea, lines) {
 
     function getDefaultStrokeColor() {
         // TODO: move to options object
-        return "rgba(0, 0, 0, 0.01)";
-        // return "transparent";
+        // return "rgba(0, 0, 0, 0.01)";
+        return "transparent";
     }
 
     function getColorByLocation(x, y, highlight) {
