@@ -66,12 +66,70 @@
             profiledGrapher = profiling.wrap("grapher", function() {
                 return grapher(canvasArea, hexagonSideLength);
             }),
-            lines = profiledGrapher(),
+            graphObjects = profiledGrapher(),
             profiledRenderer = profiling.wrap("renderer", function() {
-                return renderer(canvasId, canvasArea, lines);
-            });
+                return renderer(canvasId, canvasArea, graphObjects.lines);
+            }),
+            getRandomObject = function(objects) {
+                var keys = Object.keys(objects),
+                    count = keys.length,
+                    rnd = random.integer(0, count),
+                    key = keys[rnd],
+                    object = objects[key];
 
-        profiledRenderer();
+                return object;
+            },
+            getRandomHexagon = function() {
+                var hexagon = getRandomObject(graphObjects.hexagons);
+
+                return hexagon;
+            },
+            getRandomLine = function() {
+                var line = getRandomObject(graphObjects.lines);
+
+                return line;
+            },
+            getRandomNode = function() {
+                var node = getRandomObject(graphObjects.nodes);
+
+                return node;
+            },
+            highlightOnInterval = function() {
+                var highlightHasHappened = false,
+                    isAutomatedHighlight = false,
+                    interval;
+
+                document.addEventListener("hexagonif.line.highlight", function() {
+                    highlightHasHappened = highlightHasHappened || !isAutomatedHighlight;
+                });
+
+                document.addEventListener("hexagonif.line.unhighlight", function() {
+                    // Something
+                });
+
+                function highlightSomething() {
+                    var line = getRandomLine();
+
+                    isAutomatedHighlight = true;
+                    scene.highlightLine(line);
+                    isAutomatedHighlight = false;
+
+                    setTimeout(function() {
+                        scene.unhighlightLine(line);
+                    }, 500);
+                }
+
+                function highlightSomethingThatIfNothingHasHappened() {
+                    if (!highlightHasHappened) {
+                        highlightSomething();
+                    }
+                }
+
+                interval = setInterval(highlightSomethingThatIfNothingHasHappened, 1000);
+            },
+            scene = profiledRenderer();
+
+        highlightOnInterval();
     }
 
     function once(fn) {
@@ -125,12 +183,14 @@
 
             if (!canvas) {
                 fn.call(null);
+                return;
             }
 
             if (previousCanvasWidth !== canvas.scrollWidth) {
                 previousCanvasWidth = canvas.scrollWidth;
 
                 fn.call(null);
+                return;
             }
         });
     }
