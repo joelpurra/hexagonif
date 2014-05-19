@@ -2,13 +2,13 @@ function wrap(name, fn) {
     var wrapped = function() {
         var result;
 
-        console.timeline(name);
-        console.profile(name);
+        console && console.timeline && console.timeline(name);
+        console && console.profile && console.profile(name);
 
         result = fn.call(null);
 
-        console.timelineEnd();
-        console.profileEnd();
+        console && console.timelineEnd && console.timelineEnd();
+        console && console.profileEnd && console.profileEnd();
 
         return result;
     }
