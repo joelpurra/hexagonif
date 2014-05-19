@@ -8,8 +8,7 @@
         random = require("./modules/utils/random.js");
 
     var canvasId = "hexagonif",
-        canvasContainerId = "hexagonif-container",
-        previousCanvasWidth = 0;
+        canvasContainerId = "hexagonif-container";
 
     function getCanvas() {
         var canvas = document.getElementById(canvasId);
@@ -73,30 +72,54 @@
         profiledRenderer();
     }
 
-    function onMouseDetector(callback) {
-        var hoverDetected = false,
-            hoverDetectorFunction = function() {
-                if (!hoverDetected) {
-                    hoverDetected = true;
-                    document.removeEventListener("mouseover", hoverDetectorFunction);
-                    callback.call();
-                }
-            };
+    function once(fn) {
+        var generator = function() {
+            var hasRun = false,
+                runOnceCheck = function() {
+                    if (!hasRun) {
+                        hasRun = true;
+                        fn.call(null);
+                    }
+                };
 
-        document.addEventListener("mouseover", hoverDetectorFunction);
+            return runOnceCheck;
+        };
+
+        return generator();
+    }
+
+    function onMouseDetector(fn) {
+        var mouseDetectorCallback = function() {
+            document.removeEventListener("mouseover", mouseDetectorCallbackOnce);
+            fn.call(null);
+        },
+            mouseDetectorCallbackOnce = once(mouseDetectorCallback);
+
+        document.addEventListener("mouseover", mouseDetectorCallbackOnce);
+    }
+
+    function onResizeDetector(fn) {
+        // Currently not checking for height changes because that would
+        // reset the canvas every time the developer console was toggled
+        var previousCanvasWidth = 0;
+
+        window.addEventListener("resize", function() {
+            var canvas = getCanvas();
+
+            if (!canvas) {
+                fn.call(null);
+            }
+
+            if (previousCanvasWidth !== canvas.scrollWidth) {
+                previousCanvasWidth = canvas.scrollWidth;
+
+                fn.call(null);
+            }
+        });
     }
 
     var run = oneAtATimePlease(generateAndRender);
 
-    window.addEventListener("resize", function() {
-        var canvas = getCanvas();
-
-        if (!canvas || previousCanvasWidth !== canvas.scrollWidth) {
-            previousCanvasWidth = canvas.scrollWidth;
-
-            run();
-        }
-    });
-
-    onMouseDetector(run);
+    onMouseDetector(once(run));
+    onResizeDetector(run);
 }());
