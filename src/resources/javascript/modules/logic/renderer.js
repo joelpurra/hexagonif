@@ -24,11 +24,13 @@ function renderer(canvasId, canvasArea, lines) {
     }
 
     function getColorByLocation(x, y, highlight) {
-        var byY = Math.floor((y / canvasArea.y) * 360),
+        // NOTE: x and y are not guaranteed to be inside the canvas area
+        var byX = Math.floor((x / canvasArea.x) * 20),
+            byY = Math.floor((y / canvasArea.y) * 360),
             // TODO: move to options object
             opacity = highlight ? 0.7 : 0.3;
 
-        return "hsla(" + byY + ", 100%, 50%, " + opacity.toFixed(3) + ")";
+        return "hsla(" + byY + ", " + (100 - (byX / 2)) + "%, " + (60 - byX) + "%, " + opacity.toFixed(3) + ")";
         // return "hsla(60, 100%, 50%, 0.3)";
     }
 
