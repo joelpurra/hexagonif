@@ -75,29 +75,44 @@
     }
 
     function once(fn) {
-        var generator = function() {
-            var hasRun = false,
-                runOnceCheck = function() {
-                    if (!hasRun) {
-                        hasRun = true;
-                        fn.call(null);
-                    }
-                };
+        var hasRun = false,
+            runOnceCheck = function() {
+                if (!hasRun) {
+                    hasRun = true;
+                    fn.call(null);
+                }
+            };
 
-            return runOnceCheck;
-        };
-
-        return generator();
+        return runOnceCheck;
     }
 
     function onMouseDetector(fn) {
-        var mouseDetectorCallback = function() {
-            document.removeEventListener("mouseover", mouseDetectorCallbackOnce);
-            fn.call(null);
+        // Experimental code to detect if a mouse pointing device is used.
+        // If a mouse is detected, call the supplied function once.
+        var onTouchMoveEventArgs = {
+            target: null,
         },
-            mouseDetectorCallbackOnce = once(mouseDetectorCallback);
+            onTouchMove = function(e) {
+                onTouchMoveEventArgs.target = e.target;
+            },
+            onMouseMove = function(e) {
+                // If the target isn't the same, the assumption is that the touchmove event wasn't fired first - hence it's not a touch event.
+                // TODO: would be better to use the mouse event .x and .y, if matching ones exist in touchmove etcetera.
+                if (onTouchMoveEventArgs.target !== e.target) {
+                    onDetect();
+                }
 
-        document.addEventListener("mouseover", mouseDetectorCallbackOnce);
+                // Release pointer
+                onTouchMoveEventArgs.target = null;
+            },
+            onDetect = once(function() {
+                document.removeEventListener("touchmove", onTouchMove);
+                document.removeEventListener("mousemove", onMouseMove);
+                fn.call(null);
+            });
+
+        document.addEventListener("touchmove", onTouchMove);
+        document.addEventListener("mousemove", onMouseMove);
     }
 
     function onResizeDetector(fn) {
