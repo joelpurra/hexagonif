@@ -9,7 +9,8 @@ function renderer(canvasId, canvasArea, lines) {
 
     var canvas = oCanvas.create({
         canvas: "#" + canvasId
-    });
+    }),
+        graphicsLookupCache = {};
 
     function getDefaultStrokeWidth() {
         // TODO: move to options object
@@ -49,25 +50,33 @@ function renderer(canvasId, canvasArea, lines) {
         return canvasElement.dispatchEvent(event);
     }
 
-    function lineHighlight(event) {
+    function onLineMouseEnter(event) {
         var lineEvent = fire("line.highlight", this, this.tag);
 
         if (lineEvent.defaultPrevented) {
             return;
         }
 
-        this.strokeColor = getColorByLocation(this.x, this.y, true);
-        this.zIndex = "front";
-        this.redraw();
+        lineHighlight.call(this);
     }
 
-    function lineUnhighlight(event) {
+    function onLineMouseLeave(event) {
         var lineEvent = fire("line.unhighlight", this, this.tag);
 
         if (lineEvent.defaultPrevented) {
             return;
         }
 
+        lineUnhighlight.call(this);
+    }
+
+    function lineHighlight() {
+        this.strokeColor = getColorByLocation(this.x, this.y, true);
+        this.zIndex = "front";
+        this.redraw();
+    }
+
+    function lineUnhighlight(event) {
         this.strokeColor = getColorByLocation(this.x, this.y, false);
         this.redraw();
     }
@@ -88,8 +97,10 @@ function renderer(canvasId, canvasArea, lines) {
         scene.add(line);
 
         line
-            .bind("mouseenter", lineHighlight)
-            .bind("mouseleave", lineUnhighlight);
+            .bind("mouseenter", onLineMouseEnter)
+            .bind("mouseleave", onLineMouseLeave);
+
+        return line;
     }
 
     var sceneGrid = "grid";
@@ -106,11 +117,34 @@ function renderer(canvasId, canvasArea, lines) {
         Object.keys(lines).forEach(function(cacheKey) {
             var line = lines[cacheKey];
 
-            draw(scene, line.start, line.end, line);
+            var graphic = draw(scene, line.start, line.end, line);
+
+            graphicsLookupCache[cacheKey] = graphic;
         });
     });
 
     canvas.scenes.load(sceneGrid);
+
+    function highlightLine(line) {
+        var cacheKey = line.getCacheKey(),
+            selected = graphicsLookupCache[cacheKey];
+
+        lineHighlight.call(selected);
+    }
+
+    function unhighlightLine(line) {
+        var cacheKey = line.getCacheKey(),
+            selected = graphicsLookupCache[cacheKey];
+
+        lineUnhighlight.call(selected);
+    }
+
+    var api = {
+        highlightLine: highlightLine,
+        unhighlightLine: unhighlightLine
+    };
+
+    return api;
 }
 
 module.exports = renderer;

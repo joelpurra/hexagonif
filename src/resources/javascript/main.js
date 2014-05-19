@@ -2,6 +2,7 @@
     "use strict";
 
     var Point = require("./modules/objects/point.js"),
+        Hexagon = require("./modules/objects/hexagon.js"),
         grapher = require("./modules/logic/grapher.js"),
         renderer = require("./modules/logic/renderer.js"),
         profiling = require("./modules/utils/profiling.js"),
@@ -119,9 +120,35 @@
                     }, 500);
                 }
 
+                function highlightHexagon() {
+                    function eachLine(fn) {
+                        do {
+                            sideLine = hexagon.getSideLine(side);
+                            fn(sideLine.line);
+                            side = Hexagon.Sides.next(side);
+                        } while (side !== startSide)
+                    }
+
+                    var hexagon,
+                        startSide = Hexagon.Sides.Top,
+                        side = startSide,
+                        sideLine;
+
+                    do {
+                        hexagon = getRandomHexagon();
+                    } while (!hexagon.isComplete())
+
+                    eachLine(scene.highlightLine);
+
+                    setTimeout(function() {
+                        eachLine(scene.unhighlightLine);
+                    }, 500);
+                }
+
                 function highlightSomethingThatIfNothingHasHappened() {
                     if (!highlightHasHappened) {
                         highlightSomething();
+                        highlightHexagon();
                     }
                 }
 
@@ -175,7 +202,13 @@
 
     function onResizeDetector(fn) {
         // Currently not checking for height changes because that would
-        // reset the canvas every time the developer console was toggled
+        // reset the canvas every time the developer console was toggled.
+
+        // Chrome on Android also triggers a resize when scrolling enough to
+        // hide the address bar and menu.
+
+        // TODO: read this value once after canvas has been drawn, otherwise the first
+        // resize, even if in height, will trigger the drawing.
         var previousCanvasWidth = 0;
 
         window.addEventListener("resize", function() {

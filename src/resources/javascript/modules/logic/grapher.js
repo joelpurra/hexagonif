@@ -24,33 +24,43 @@ function grapher(canvasArea, hexagonSideLength) {
             corner = startCorner;
 
         do {
-            var pointCacheKey = point.getCacheKey(),
-                cachedPoint = nodes[pointCacheKey];
+            // Points and corners
+            {
+                var pointCacheKey = point.getCacheKey(),
+                    cachedPoint = nodes[pointCacheKey];
 
-            if (cachedPoint === undefined) {
-                nodes[pointCacheKey] = point;
-            } else {
-                point = cachedPoint;
+                if (cachedPoint === undefined) {
+                    nodes[pointCacheKey] = point;
+                } else {
+                    point = cachedPoint;
+                }
+
+                hexagon.setCornerPoint(corner, point);
+
+                var nextCorner = Hexagon.Corners.next(corner);
+                var angle = (nextCorner.rotation / 180) * Math.PI;
+                var x = limitPrecision(point.x + hexagonSideLength * Math.cos(angle), 5),
+                    y = limitPrecision(point.y + hexagonSideLength * Math.sin(angle), 5);
+                var nextPoint = new Point(x, y);
             }
 
-            hexagon.setCornerPoint(corner, point);
+            // Lines and sides
+            {
+                var line = new Line(point, nextPoint);
 
-            var nextCorner = Hexagon.Corners.next(corner);
-            var angle = (nextCorner.rotation / 180) * Math.PI;
-            var x = limitPrecision(point.x + hexagonSideLength * Math.cos(angle), 5),
-                y = limitPrecision(point.y + hexagonSideLength * Math.sin(angle), 5);
-            var nextPoint = new Point(x, y);
+                var lineCacheKey = line.getCacheKey(),
+                    cachedLine = lines[lineCacheKey];
 
-            var line = new Line(point, nextPoint);
+                if (cachedLine === undefined) {
+                    lines[lineCacheKey] = line;
+                } else {
+                    //throw new Error("Line already exists " + line.getCacheKey())
+                    line = cachedLine;
+                }
 
-            var lineCacheKey = line.getCacheKey(),
-                cachedLine = lines[lineCacheKey];
+                var side = Hexagon.Sides.fromCorner(corner);
 
-            if (cachedLine === undefined) {
-                lines[lineCacheKey] = line;
-            } else {
-                //throw new Error("Line already exists " + line.getCacheKey())
-                line = cachedLine;
+                hexagon.setSideLine(side, line);
             }
 
             point = nextPoint;
@@ -89,9 +99,15 @@ function grapher(canvasArea, hexagonSideLength) {
         nodes = [],
         lines = [],
         startInCanvas = new Point(random.integer(canvasArea.x), random.integer(canvasArea.y))
-        graph = getOrGenerateHexagon(canvasArea, hexagons, nodes, lines, hexagonSideLength, startInCanvas, Hexagon.Corners.BottomLeft, 0);
+        graph = getOrGenerateHexagon(canvasArea, hexagons, nodes, lines, hexagonSideLength, startInCanvas, Hexagon.Corners.BottomLeft, 0),
+        api = {
+            hexagons: hexagons,
+            nodes: nodes,
+            lines: lines,
+            graph: graph,
+        };
 
-    return lines;
+    return api;
 }
 
 module.exports = grapher;
