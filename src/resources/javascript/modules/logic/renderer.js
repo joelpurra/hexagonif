@@ -40,13 +40,34 @@ function renderer(canvasId, canvasArea, lines) {
         strokeColor: getDefaultStrokeColor(),
     });
 
+    function fire(name, graphic, object) {
+        // TODO: custom event structure
+        var event = document.createEvent('HTMLEvents');
+        event.initEvent('hexagonif.' + name, true, true);
+        event.graphic = graphic;
+        event.object = object;
+        return canvasElement.dispatchEvent(event);
+    }
+
     function lineHighlight(event) {
+        var lineEvent = fire("line.highlight", this, this.tag);
+
+        if (lineEvent.defaultPrevented) {
+            return;
+        }
+
         this.strokeColor = getColorByLocation(this.x, this.y, true);
         this.zIndex = "front";
         this.redraw();
     }
 
     function lineUnhighlight(event) {
+        var lineEvent = fire("line.unhighlight", this, this.tag);
+
+        if (lineEvent.defaultPrevented) {
+            return;
+        }
+
         this.strokeColor = getColorByLocation(this.x, this.y, false);
         this.redraw();
     }
