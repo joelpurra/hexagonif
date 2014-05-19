@@ -50,9 +50,11 @@
 
     function calculateHexagonSideLength() {
         var canvas = getCanvas(),
+            absoluteMin = 50,
+            absoluteMax = 150,
             shortestCanvasSide = Math.min(canvas.scrollWidth, canvas.scrollHeight),
-            min = shortestCanvasSide / 20,
-            max = shortestCanvasSide / 10;
+            min = Math.max(absoluteMin, shortestCanvasSide / 20),
+            max = Math.min(absoluteMax, shortestCanvasSide / 10);
 
         return random.integer(min, max);
     }
