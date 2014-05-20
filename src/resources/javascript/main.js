@@ -115,6 +115,12 @@
                     // Something
                 });
 
+                function resetRandomLine() {
+                    var line = getRandomLine();
+
+                    scene.resetLine(line);
+                }
+
                 function highlightRandomLine() {
                     var line = getRandomLine();
 
@@ -134,7 +140,9 @@
                         hexagon = getRandomHexagon();
                     } while (!hexagon.isComplete())
 
+                    isAutomatedHighlight = true;
                     scene.highlightHexagon(hexagon);
+                    isAutomatedHighlight = false;
 
                     setTimeout(function() {
                         scene.unhighlightHexagon(hexagon);
@@ -145,7 +153,9 @@
                     var rnd = random.integer(10);
 
                     if (highlightCounter === 0) {
-                        if (rnd < 9) {
+                        if (rnd < 2) {
+                            resetRandomLine();
+                        } else if (rnd < 9) {
                             highlightRandomLine();
                         } else {
                             highlightRandomHexagon();

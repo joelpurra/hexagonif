@@ -52,32 +52,44 @@ function renderer(canvasId, canvasArea, lines) {
     }
 
     function onLineMouseEnter(event) {
+        lineHighlight.call(this);
+    }
+
+    function onLineMouseLeave(event) {
+        lineUnhighlight.call(this);
+    }
+
+    function lineReset() {
+        var lineEvent = fire("line.reset", this, this.tag);
+
+        if (lineEvent.defaultPrevented) {
+            return;
+        }
+
+        this.strokeColor = getDefaultStrokeColor();
+        this.zIndex = "back";
+        this.redraw();
+    }
+
+    function lineHighlight() {
         var lineEvent = fire("line.highlight", this, this.tag);
 
         if (lineEvent.defaultPrevented) {
             return;
         }
 
-        lineHighlight.call(this);
-    }
-
-    function onLineMouseLeave(event) {
-        var lineEvent = fire("line.unhighlight", this, this.tag);
-
-        if (lineEvent.defaultPrevented) {
-            return;
-        }
-
-        lineUnhighlight.call(this);
-    }
-
-    function lineHighlight() {
         this.strokeColor = getColorByLocation(this.x, this.y, true);
         this.zIndex = "front";
         this.redraw();
     }
 
     function lineUnhighlight(event) {
+        var lineEvent = fire("line.unhighlight", this, this.tag);
+
+        if (lineEvent.defaultPrevented) {
+            return;
+        }
+
         this.strokeColor = getColorByLocation(this.x, this.y, false);
         this.redraw();
     }
@@ -133,6 +145,13 @@ function renderer(canvasId, canvasArea, lines) {
         lineHighlight.call(selected);
     }
 
+    function resetLine(line) {
+        var cacheKey = line.getCacheKey(),
+            selected = graphicsLookupCache[cacheKey];
+
+        lineReset.call(selected);
+    }
+
     function eachLineInHexagon(hexagon, fn) {
         var startSide = Hexagon.Sides.Top,
             side = startSide,
@@ -161,6 +180,7 @@ function renderer(canvasId, canvasArea, lines) {
     }
 
     var api = {
+        resetLine: resetLine,
         highlightLine: highlightLine,
         unhighlightLine: unhighlightLine,
         highlightHexagon: highlightHexagon,
