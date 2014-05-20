@@ -2,7 +2,6 @@
     "use strict";
 
     var Point = require("./modules/objects/point.js"),
-        Hexagon = require("./modules/objects/hexagon.js"),
         grapher = require("./modules/logic/grapher.js"),
         renderer = require("./modules/logic/renderer.js"),
         profiling = require("./modules/utils/profiling.js"),
@@ -108,7 +107,7 @@
                     // Something
                 });
 
-                function highlightSomething() {
+                function highlightRandomLine() {
                     var line = getRandomLine();
 
                     isAutomatedHighlight = true;
@@ -120,35 +119,24 @@
                     }, 500);
                 }
 
-                function highlightHexagon() {
-                    function eachLine(fn) {
-                        do {
-                            sideLine = hexagon.getSideLine(side);
-                            fn(sideLine.line);
-                            side = Hexagon.Sides.next(side);
-                        } while (side !== startSide)
-                    }
-
-                    var hexagon,
-                        startSide = Hexagon.Sides.Top,
-                        side = startSide,
-                        sideLine;
+                function highlightRandomHexagon() {
+                    var hexagon;
 
                     do {
                         hexagon = getRandomHexagon();
                     } while (!hexagon.isComplete())
 
-                    eachLine(scene.highlightLine);
+                    scene.highlightHexagon(hexagon);
 
                     setTimeout(function() {
-                        eachLine(scene.unhighlightLine);
+                        scene.unhighlightHexagon(hexagon);
                     }, 500);
                 }
 
                 function highlightSomethingThatIfNothingHasHappened() {
                     if (!highlightHasHappened) {
-                        highlightSomething();
-                        highlightHexagon();
+                        highlightRandomLine();
+                        highlightRandomHexagon();
                     }
                 }
 

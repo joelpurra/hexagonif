@@ -1,5 +1,6 @@
 function renderer(canvasId, canvasArea, lines) {
-    var random = require("../utils/random.js");
+    var random = require("../utils/random.js"),
+        Hexagon = require("../objects/hexagon.js");
 
     // TODO: use hidpi-canvas-polyfill
     // https://github.com/jondavidjohn/hidpi-canvas-polyfill
@@ -132,6 +133,26 @@ function renderer(canvasId, canvasArea, lines) {
         lineHighlight.call(selected);
     }
 
+    function eachLineInHexagon(hexagon, fn) {
+        var startSide = Hexagon.Sides.Top,
+            side = startSide,
+            sideLine;
+
+        do {
+            sideLine = hexagon.getSideLine(side);
+            fn(sideLine.line);
+            side = Hexagon.Sides.next(side);
+        } while (side !== startSide)
+    }
+
+    function highlightHexagon(hexagon) {
+        eachLineInHexagon(hexagon, highlightLine);
+    }
+
+    function unhighlightHexagon(hexagon) {
+        eachLineInHexagon(hexagon, unhighlightLine);
+    }
+
     function unhighlightLine(line) {
         var cacheKey = line.getCacheKey(),
             selected = graphicsLookupCache[cacheKey];
@@ -141,7 +162,9 @@ function renderer(canvasId, canvasArea, lines) {
 
     var api = {
         highlightLine: highlightLine,
-        unhighlightLine: unhighlightLine
+        unhighlightLine: unhighlightLine,
+        highlightHexagon: highlightHexagon,
+        unhighlightHexagon: unhighlightHexagon,
     };
 
     return api;
