@@ -95,12 +95,20 @@
                 return node;
             },
             highlightOnInterval = function() {
-                var highlightHasHappened = false,
+                var MAX_AUTO_HIGHLIGHT_DELAY = 10,
+                    highlightCounter = 0,
+                    highlightCounterInterval,
                     isAutomatedHighlight = false,
-                    interval;
+                    highlightInterval;
+
+                function highlightCounterDecreaser() {
+                    highlightCounter = Math.max(0, highlightCounter - 1);
+                }
 
                 document.addEventListener("hexagonif.line.highlight", function() {
-                    highlightHasHappened = highlightHasHappened || !isAutomatedHighlight;
+                    if (!isAutomatedHighlight) {
+                        highlightCounter = Math.min(Number.MAX_VALUE - 1, highlightCounter + 1, MAX_AUTO_HIGHLIGHT_DELAY);
+                    }
                 });
 
                 document.addEventListener("hexagonif.line.unhighlight", function() {
@@ -134,13 +142,14 @@
                 }
 
                 function highlightSomethingThatIfNothingHasHappened() {
-                    if (!highlightHasHappened) {
+                    if (highlightCounter === 0) {
                         highlightRandomLine();
                         highlightRandomHexagon();
                     }
                 }
 
-                interval = setInterval(highlightSomethingThatIfNothingHasHappened, 1000);
+                highlightCounterInterval = setInterval(highlightCounterDecreaser, 1000);
+                highlightInterval = setInterval(highlightSomethingThatIfNothingHasHappened, 1000);
             },
             scene = profiledRenderer();
 
