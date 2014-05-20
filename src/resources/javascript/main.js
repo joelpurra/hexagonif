@@ -142,9 +142,14 @@
                 }
 
                 function highlightSomethingThatIfNothingHasHappened() {
+                    var rnd = random.integer(10);
+
                     if (highlightCounter === 0) {
-                        highlightRandomLine();
-                        highlightRandomHexagon();
+                        if (rnd < 9) {
+                            highlightRandomLine();
+                        } else {
+                            highlightRandomHexagon();
+                        }
                     }
                 }
 
