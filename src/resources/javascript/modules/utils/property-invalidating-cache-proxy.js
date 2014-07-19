@@ -16,15 +16,20 @@ function generateProxiedSetter(propName) {
 
 function generateCacheInvalidatingProxiedSetter(propName, invalidates) {
     function cacheInvalidatingProxiedSetter(val) {
-        var cachedPropertyOrFunctionValue = this.cache[invalidates];
+        invalidates.forEach(function(invalidate) {
+            var cachedPropertyOrFunctionValue = this.cache[invalidate];
 
-        if (cachedPropertyOrFunctionValue) {
-            cachedPropertyOrFunctionValue.isCached = false;
-            cachedPropertyOrFunctionValue.value = undefined;
-        }
+            if (cachedPropertyOrFunctionValue) {
+                cachedPropertyOrFunctionValue.isCached = false;
+                cachedPropertyOrFunctionValue.value = undefined;
+            }
+        });
 
         proxiedSetter.apply(this, arguments);
     }
+
+    // Make sure it's an array
+    invalidates = [].concat(invalidates);
 
     var proxiedSetter = generateProxiedSetter(propName);
 
@@ -91,11 +96,7 @@ function getProxyPrototype(clazz, proxyCacheInvalidationMap) {
         }, {});
 
     proxyPropertyKeys.forEach(function(proxyPropertyKey) {
-        var invalidationKeysArray = [].concat(proxyCacheInvalidationMap[proxyPropertyKey]);
-
-        invalidationKeysArray.forEach(function(invalidationKey) {
-            generateCacheInvalidatingProperty(proxyPrototype, proxyPropertyKey, invalidationKey);
-        });
+        generateCacheInvalidatingProperty(proxyPrototype, proxyPropertyKey, proxyCacheInvalidationMap[proxyPropertyKey]);
     });
 
     invalidationKeys.forEach(function(invalidatesKey) {
