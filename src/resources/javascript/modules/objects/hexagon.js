@@ -212,8 +212,8 @@ Hexagon.prototype.getCacheKey = function() {
         hexagon = this;
 
     this.cornerPoints().slice(0, 2).some(function(cornerPoint) {
-        var oppositeCorner = !! cornerPoint && Hexagon.Corners.opposite(cornerPoint.corner),
-            oppositeCornerPoint = !! oppositeCorner && hexagon.getCornerPoint(oppositeCorner),
+        var oppositeCorner = ( !! cornerPoint) && Hexagon.Corners.opposite(cornerPoint.corner),
+            oppositeCornerPoint = ( !! oppositeCorner) && hexagon.getCornerPoint(oppositeCorner),
             line = oppositeCornerPoint && new Line(cornerPoint.point, oppositeCornerPoint.point),
             center = line && line.center();
 
@@ -232,7 +232,7 @@ Hexagon.prototype.getCacheKey = function() {
 Hexagon.prototype.cornerCount = function() {
     // TODO: get a library that has .count()
     var count = this.cornerPoints().reduce(function(prev, cornerPoint) {
-        return prev + (cornerPoint === undefined ? 0 : 1);
+        return prev + (( !! cornerPoint) ? 1 : 0);
     }, 0);
 
     return count;
