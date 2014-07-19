@@ -48,17 +48,21 @@ function generateCachedPropertyOrFunction(proxyPrototype, clazzPrototype, propNa
         var cachedPropertyOrFunctionValue = (this.cache[propName] || (this.cache[propName] = {})),
             result;
 
-        if (!cachedPropertyOrFunctionValue.isCached) {
+        if (this.recursiveCallsCounter || !cachedPropertyOrFunctionValue.isCached) {
             // TODO: try-catch?
-            // TODO: throw new Error("Should it be this or this.subject? Recursive calls?")
+            this.recursiveCallsCounter++;
             result = this.subject[propName].apply(this, arguments);
-            // result = this.subject[propName].apply(this.subject, arguments);
+            this.recursiveCallsCounter--;
 
-            cachedPropertyOrFunctionValue.value = result;
-            cachedPropertyOrFunctionValue.isCached = true;
+            if (!this.recursiveCallsCounter) {
+                cachedPropertyOrFunctionValue.value = result;
+                cachedPropertyOrFunctionValue.isCached = true;
+            }
+        } else {
+            result = cachedPropertyOrFunctionValue.value;
         }
 
-        return cachedPropertyOrFunctionValue.value;
+        return result;
     }
 
     var propType = typeof clazzPrototype[propName];
@@ -72,7 +76,6 @@ function generateCachedPropertyOrFunction(proxyPrototype, clazzPrototype, propNa
 }
 
 function getProxyPrototype(clazz, proxyCacheInvalidationMap) {
-    // Object.getPrototypeOf()?
     var clazzPrototype = clazz.prototype,
         clazzKeys = Object.keys(clazzPrototype),
         proxyPropertyKeys = Object.keys(proxyCacheInvalidationMap),
@@ -114,6 +117,7 @@ function copyClassStatic(from, to) {
 
 function generate(clazz, proxyCacheInvalidationMap) {
     function CachingProxy() {
+        this.recursiveCallsCounter = 0;
         this.cache = {};
         this.subject = clazz.prototype.constructor.apply(Object.create(clazz.prototype), arguments);
 
