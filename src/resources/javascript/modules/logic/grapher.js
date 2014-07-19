@@ -95,9 +95,9 @@ function grapher(canvasArea, hexagonSideLength) {
         return hexagon;
     }
 
-    var hexagons = [],
-        nodes = [],
-        lines = [],
+    var hexagons = {},
+        nodes = {},
+        lines = {},
         startInCanvas = new Point(random.integer(canvasArea.x), random.integer(canvasArea.y))
         graph = getOrGenerateHexagon(canvasArea, hexagons, nodes, lines, hexagonSideLength, startInCanvas, Hexagon.Corners.BottomLeft, 0),
         api = {
