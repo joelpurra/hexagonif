@@ -1,4 +1,4 @@
-var Point = require("./point.js");
+var Point = require("../proxied/point.js");
 
 function Line(start, end) {
     this.start = start;

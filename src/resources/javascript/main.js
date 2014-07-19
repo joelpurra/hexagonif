@@ -1,7 +1,7 @@
 (function main() {
     "use strict";
 
-    var Point = require("./modules/objects/point.js"),
+    var Point = require("./modules/proxied/point.js"),
         grapher = require("./modules/logic/grapher.js"),
         renderer = require("./modules/logic/renderer.js"),
         profiling = require("./modules/utils/profiling.js"),

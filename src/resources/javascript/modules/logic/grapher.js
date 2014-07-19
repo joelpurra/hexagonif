@@ -1,4 +1,4 @@
-var Point = require("../objects/point.js"),
+var Point = require("../proxied/point.js"),
     Line = require("../objects/line.js"),
     Hexagon = require("../objects/hexagon.js"),
     limitPrecision = require("../utils/limit-precision.js"),
