@@ -23,7 +23,7 @@ function generateCacheInvalidatingProxiedSetter(propName, invalidates) {
                 cachedPropertyOrFunctionValue.isCached = false;
                 cachedPropertyOrFunctionValue.value = undefined;
             }
-        });
+        }.bind(this));
 
         proxiedSetter.apply(this, arguments);
     }
