@@ -87,7 +87,7 @@ function getProxyPrototype(clazz, proxyCacheInvalidationMap) {
             return invalidatesFlattened;
         }, {})),
         unproxiedKeys = clazzKeys.filter(function(clazzKey) {
-            return (proxyPropertyKeys.indexOf(clazzKey) !== -1 && !invalidationKeys.indexOf(clazzKey) !== -1);
+            return (proxyPropertyKeys.indexOf(clazzKey) === -1 && invalidationKeys.indexOf(clazzKey) === -1);
         }),
         proxyPrototype = unproxiedKeys.reduce(function(unproxiedProxyPrototype, unproxiedKey) {
             unproxiedProxyPrototype[unproxiedKey] = clazzPrototype[unproxiedKey];
