@@ -118,7 +118,7 @@ function renderer(canvasId, canvasArea, lines) {
 
     var sceneGrid = "grid";
 
-    canvas.scenes.create(sceneGrid, function() {
+    canvas.scenes.create(sceneGrid, function canvasScenesCreate() {
         var scene = this;
 
         // Object.keys(nodes).sort().reduce(function(start, end) {
@@ -127,7 +127,7 @@ function renderer(canvasId, canvasArea, lines) {
         //     return end;
         // });
 
-        Object.keys(lines).forEach(function(cacheKey) {
+        Object.keys(lines).forEach(function linesForEachCreateGraphic(cacheKey) {
             var line = lines[cacheKey];
 
             var graphic = draw(scene, line.start, line.end, line);

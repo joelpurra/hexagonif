@@ -84,10 +84,10 @@ function grapher(canvasArea, hexagonSideLength) {
             hexagons[hexagonCacheKey] = hexagon;
         }
 
-        hexagon.cornerPoints().forEach(function(cornerPoint) {
+        hexagon.cornerPoints().forEach(function forEachHexagonCornerPoint(cornerPoint) {
             var connecting = Hexagon.Corners.connecting(cornerPoint.corner);
 
-            connecting.forEach(function(connected) {
+            connecting.forEach(function forEachHexagonConnectingCornerPoint(connected) {
                 getOrGenerateHexagon(area, hexagons, nodes, lines, hexagonSideLength, cornerPoint.point, connected, depth + 1);
             });
         });

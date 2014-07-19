@@ -1,4 +1,4 @@
-(function() {
+(function main() {
     "use strict";
 
     var Point = require("./modules/objects/point.js"),
@@ -34,7 +34,7 @@
 
     function oneAtATimePlease(fn) {
         var running = false,
-            wrapper = function() {
+            wrapper = function oneAtATimePleaseWrapper() {
                 if (running) {
                     return;
                 }
@@ -63,11 +63,11 @@
         var canvas = createCanvas(),
             canvasArea = new Point(canvas.scrollWidth, canvas.scrollHeight),
             hexagonSideLength = calculateHexagonSideLength(),
-            profiledGrapher = profiling.wrap("grapher", function() {
+            profiledGrapher = profiling.wrap("grapher", function profiledGrapherWrapper() {
                 return grapher(canvasArea, hexagonSideLength);
             }),
             graphObjects = profiledGrapher(),
-            profiledRenderer = profiling.wrap("renderer", function() {
+            profiledRenderer = profiling.wrap("renderer", function profiledRendererWrapper() {
                 return renderer(canvasId, canvasArea, graphObjects.lines);
             }),
             getRandomObject = function(objects) {
@@ -105,13 +105,13 @@
                     highlightCounter = Math.max(0, highlightCounter - 1);
                 }
 
-                document.addEventListener("hexagonif.line.highlight", function() {
+                document.addEventListener("hexagonif.line.highlight", function hexagonifLineHighlightEventListener() {
                     if (!isAutomatedHighlight) {
                         highlightCounter = Math.min(Number.MAX_VALUE - 1, highlightCounter + 1, MAX_AUTO_HIGHLIGHT_DELAY);
                     }
                 });
 
-                document.addEventListener("hexagonif.line.unhighlight", function() {
+                document.addEventListener("hexagonif.line.unhighlight", function hexagonifLineUnhighlightEventListener() {
                     // Something
                 });
 
@@ -128,7 +128,7 @@
                     scene.highlightLine(line);
                     isAutomatedHighlight = false;
 
-                    setTimeout(function() {
+                    setTimeout(function unhighlightSameRandomLine() {
                         scene.unhighlightLine(line);
                     }, 500);
                 }
@@ -144,7 +144,7 @@
                     scene.highlightHexagon(hexagon);
                     isAutomatedHighlight = false;
 
-                    setTimeout(function() {
+                    setTimeout(function unhighlightSameRandomHexagon() {
                         scene.unhighlightHexagon(hexagon);
                     }, 500);
                 }
@@ -223,7 +223,7 @@
         // resize, even if in height, will trigger the drawing.
         var previousCanvasWidth = 0;
 
-        window.addEventListener("resize", function() {
+        window.addEventListener("resize", function onResizeEventListener() {
             var canvas = getCanvas();
 
             if (!canvas) {
