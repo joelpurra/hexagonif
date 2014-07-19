@@ -16,7 +16,7 @@ function generateProxiedSetter(propName) {
 
 function generateCacheInvalidatingProxiedSetter(propName, invalidates) {
     function cacheInvalidatingProxiedSetter(val) {
-        invalidates.forEach(function(invalidate) {
+        invalidates.forEach(function invalidateCache(invalidate) {
             var cachedPropertyOrFunctionValue = this.cache[invalidate];
 
             if (cachedPropertyOrFunctionValue) {
