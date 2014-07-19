@@ -106,6 +106,12 @@ function getProxyPrototype(clazz, proxyCacheInvalidationMap) {
     return proxyPrototype;
 }
 
+function copyClassStatic(from, to) {
+    Object.keys(from).forEach(function(fromKey) {
+        to[fromKey] = from[fromKey];
+    });
+}
+
 function generate(clazz, proxyCacheInvalidationMap) {
     function CachingProxy() {
         this.cache = {};
@@ -113,6 +119,8 @@ function generate(clazz, proxyCacheInvalidationMap) {
 
         return this;
     }
+
+    copyClassStatic(clazz, CachingProxy);
 
     CachingProxy.prototype = getProxyPrototype(clazz, proxyCacheInvalidationMap);
 
