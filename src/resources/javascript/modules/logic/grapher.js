@@ -1,6 +1,6 @@
 var Point = require("../proxied/point.js"),
-    Line = require("../objects/line.js"),
-    Hexagon = require("../objects/hexagon.js"),
+    Line = require("../proxied/line.js"),
+    Hexagon = require("../proxied/hexagon.js"),
     limitPrecision = require("../utils/limit-precision.js"),
     random = require("../utils/random.js");
 

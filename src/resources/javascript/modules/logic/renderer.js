@@ -1,6 +1,6 @@
 function renderer(canvasId, canvasArea, lines) {
     var random = require("../utils/random.js"),
-        Hexagon = require("../objects/hexagon.js");
+        Hexagon = require("../proxied/hexagon.js");
 
     // TODO: use hidpi-canvas-polyfill
     // https://github.com/jondavidjohn/hidpi-canvas-polyfill

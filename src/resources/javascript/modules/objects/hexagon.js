@@ -1,29 +1,27 @@
 var Corner = require("./corner.js"),
     CornerPoint = require("./cornerpoint.js"),
     Side = require("./side.js"),
-    Line = require("./line.js"),
+    Line = require("../proxied/line.js"),
     SideLine = require("./sideline.js");
 
 var NUMBER_OF_SIDES = 6;
 
 function Hexagon() {
-    this.points = {
-        topLeft: null,
-        topRight: null,
-        right: null,
-        bottomRight: null,
-        bottomLeft: null,
-        left: null,
-    };
+    this.pointsAsProperties_topLeft = null;
+    this.pointsAsProperties_topRight = null;
+    this.pointsAsProperties_right = null;
+    this.pointsAsProperties_bottomRight = null;
+    this.pointsAsProperties_bottomLeft = null;
+    this.pointsAsProperties_left = null;
 
-    this.lines = {
-        top: null,
-        topRight: null,
-        bottomRight: null,
-        bottom: null,
-        bottomLeft: null,
-        topLeft: null,
-    };
+    this.linesAsProperties_top = null;
+    this.linesAsProperties_topRight = null;
+    this.linesAsProperties_bottomRight = null;
+    this.linesAsProperties_bottom = null;
+    this.linesAsProperties_bottomLeft = null;
+    this.linesAsProperties_topLeft = null;
+
+    return this;
 }
 
 Hexagon.Corners = {
@@ -243,7 +241,14 @@ Hexagon.prototype.isComplete = function() {
 };
 
 Hexagon.prototype.cornerPoints = function() {
-    return [this.points.topLeft, this.points.topRight, this.points.right, this.points.bottomRight, this.points.bottomLeft, this.points.left];
+    return [
+        this.pointsAsProperties_topLeft,
+        this.pointsAsProperties_topRight,
+        this.pointsAsProperties_right,
+        this.pointsAsProperties_bottomRight,
+        this.pointsAsProperties_bottomLeft,
+        this.pointsAsProperties_left
+    ];
 };
 
 Hexagon.prototype.getCornerPoint = function(corner) {
@@ -267,22 +272,22 @@ Hexagon.prototype.setCornerPoint = function(corner, point) {
 
     switch (corner) {
         case Hexagon.Corners.TopLeft:
-            this.points.topLeft = cornerPoint;
+            this.pointsAsProperties_topLeft = cornerPoint;
             break;
         case Hexagon.Corners.TopRight:
-            this.points.topRight = cornerPoint;
+            this.pointsAsProperties_topRight = cornerPoint;
             break;
         case Hexagon.Corners.Right:
-            this.points.right = cornerPoint;
+            this.pointsAsProperties_right = cornerPoint;
             break;
         case Hexagon.Corners.BottomRight:
-            this.points.bottomRight = cornerPoint;
+            this.pointsAsProperties_bottomRight = cornerPoint;
             break;
         case Hexagon.Corners.BottomLeft:
-            this.points.bottomLeft = cornerPoint;
+            this.pointsAsProperties_bottomLeft = cornerPoint;
             break;
         case Hexagon.Corners.Left:
-            this.points.left = cornerPoint;
+            this.pointsAsProperties_left = cornerPoint;
             break;
         default:
             throw new Error("Unknown corner " + corner);
@@ -299,7 +304,14 @@ Hexagon.prototype.sideCount = function() {
 };
 
 Hexagon.prototype.sideLines = function() {
-    return [this.lines.top, this.lines.topRight, this.lines.bottomRight, this.lines.bottom, this.lines.bottomLeft, this.lines.topLeft];
+    return [
+        this.linesAsProperties_top,
+        this.linesAsProperties_topRight,
+        this.linesAsProperties_bottomRight,
+        this.linesAsProperties_bottom,
+        this.linesAsProperties_bottomLeft,
+        this.linesAsProperties_topLeft
+    ];
 };
 
 Hexagon.prototype.getSideLine = function(side) {
@@ -323,22 +335,22 @@ Hexagon.prototype.setSideLine = function(side, line) {
 
     switch (side) {
         case Hexagon.Sides.Top:
-            this.lines.top = sideLine;
+            this.linesAsProperties_top = sideLine;
             break;
         case Hexagon.Sides.TopRight:
-            this.lines.topRight = sideLine;
+            this.linesAsProperties_topRight = sideLine;
             break;
         case Hexagon.Sides.BottomRight:
-            this.lines.bottomRight = sideLine;
+            this.linesAsProperties_bottomRight = sideLine;
             break;
         case Hexagon.Sides.Bottom:
-            this.lines.bottom = sideLine;
+            this.linesAsProperties_bottom = sideLine;
             break;
         case Hexagon.Sides.BottomLeft:
-            this.lines.bottomLeft = sideLine;
+            this.linesAsProperties_bottomLeft = sideLine;
             break;
         case Hexagon.Sides.TopLeft:
-            this.lines.topLeft = sideLine;
+            this.linesAsProperties_topLeft = sideLine;
             break;
         default:
             throw new Error("Unknown side " + side);
