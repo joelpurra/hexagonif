@@ -2,6 +2,7 @@
     "use strict";
 
     var Point = require("./modules/objects/point.js"),
+        Line = require("./modules/objects/line.js"),
         grapher = require("./modules/logic/grapher.js"),
         renderer = require("./modules/logic/renderer.js"),
         profiling = require("./modules/utils/profiling.js"),
