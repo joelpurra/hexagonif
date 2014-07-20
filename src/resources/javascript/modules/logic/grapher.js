@@ -69,7 +69,6 @@ function grapher(canvasArea, hexagonSideLength) {
             // TODO: fix equality check
         } while (corner.rotation !== startCorner.rotation)
 
-
         // TODO: base cache key on location index, so this check can be done much earlier
         var hexagonCacheKey = hexagon.getCacheKey(),
             cachedHexagon = hexagons[hexagonCacheKey];
@@ -84,13 +83,22 @@ function grapher(canvasArea, hexagonSideLength) {
             hexagons[hexagonCacheKey] = hexagon;
         }
 
-        hexagon.cornerPoints().forEach(function forEachHexagonCornerPoint(cornerPoint) {
-            var connecting = Hexagon.Corners.connecting(cornerPoint.corner);
+        // Wrote out .forEach loops over arrays to avoid too many function calls on the stack.
+        // Makes debugging the stack prettier, if nothing else.
+        {
+            var cornerPoints = hexagon.cornerPoints();
 
-            connecting.forEach(function forEachHexagonConnectingCornerPoint(connected) {
-                getOrGenerateHexagon(area, hexagons, nodes, lines, hexagonSideLength, cornerPoint.point, connected, depth + 1);
-            });
-        });
+            for (var i = 0; i < cornerPoints.length; i++) {
+                var cornerPoint = cornerPoints[i],
+                    connecting = Hexagon.Corners.connecting(cornerPoint.corner);
+
+                for (var j = 0; j < connecting.length; j++) {
+                    var connected = connecting[j];
+
+                    getOrGenerateHexagon(area, hexagons, nodes, lines, hexagonSideLength, cornerPoint.point, connected, depth + 1);
+                }
+            }
+        }
 
         return hexagon;
     }
