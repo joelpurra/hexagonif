@@ -167,7 +167,36 @@
                 highlightCounterInterval = setInterval(highlightCounterDecreaser, 1000);
                 highlightInterval = setInterval(highlightSomethingThatIfNothingHasHappened, 1000);
             },
-            scene = profiledRenderer();
+            addGonifLines = function() {
+                Object.keys(graphObjects.gonifs).forEach(function(gonifKey) {
+                    var gonif = graphObjects.gonifs[gonifKey],
+                        fromLine = gonif.hexagon.getLineThroughMiddle(),
+                        fromCenter = fromLine && fromLine.center();
+
+                    if (!fromCenter) {
+                        return;
+                    }
+
+                    gonif.getNeighbors().forEach(function(neighbor) {
+                        if (neighbor) {
+                            var toLine = neighbor.hexagon.getLineThroughMiddle(),
+                                toCenter = toLine && toLine.center();
+
+                            if (!toCenter) {
+                                return;
+                            }
+
+                            var line = new Line(fromCenter, toCenter);
+
+                            graphObjects.lines[line.cacheKey] = line;
+                        }
+                    });
+                });
+            },
+            scene;
+        addGonifLines();
+
+        scene = profiledRenderer();
 
         highlightOnInterval();
     }
