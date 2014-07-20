@@ -2,19 +2,17 @@ var Point = require("../objects/point.js"),
     Line = require("../objects/line.js"),
     Hexagon = require("../objects/hexagon.js"),
     limitPrecision = require("../utils/limit-precision.js"),
-    random = require("../utils/random.js");
+    random = require("../utils/random.js"),
 
-function grapher(canvasArea, hexagonSideLength) {
-    var countdown = 1000;
+    maxDepth = 500;
 
-    function getOrGenerateHexagon(area, hexagons, nodes, lines, hexagonSideLength, startPoint, startCorner, depth) {
-        if (depth > countdown) {
-            // || !countdown
-            return null
+function generateGraph(area, hexagons, nodes, lines, hexagonSideLength, startPoint, startCorner, depth) {
+    function getOrGenerateHexagon(startPoint, startCorner, depth) {
+        if (depth > maxDepth) {
+            throw new Error("The max grapher depth of " + maxDepth + " was reached.");
         }
-        // countdown--;
 
-        if ((startPoint.x < 0 - hexagonSideLength) || (startPoint.x > canvasArea.x + hexagonSideLength) || (startPoint.y < 0 - hexagonSideLength) || (startPoint.y > canvasArea.y + hexagonSideLength)) {
+        if ((startPoint.x < 0 - hexagonSideLength) || (startPoint.x > area.x + hexagonSideLength) || (startPoint.y < 0 - hexagonSideLength) || (startPoint.y > area.y + hexagonSideLength)) {
             return null;
         }
 
@@ -98,7 +96,7 @@ function grapher(canvasArea, hexagonSideLength) {
                     for (var j = 0; j < connecting.length; j++) {
                         var connected = connecting[j];
 
-                        getOrGenerateHexagon(area, hexagons, nodes, lines, hexagonSideLength, cornerPoint.point, connected, depth + 1);
+                        getOrGenerateHexagon(cornerPoint.point, connected, depth + 1);
                     }
                 }
             }
@@ -107,11 +105,17 @@ function grapher(canvasArea, hexagonSideLength) {
         return hexagon;
     }
 
+    var graph = getOrGenerateHexagon(startPoint, startCorner, depth);
+
+    return graph;
+}
+
+function grapher(canvasArea, hexagonSideLength) {
     var hexagons = {},
         nodes = {},
         lines = {},
         startInCanvas = new Point(random.integer(canvasArea.x), random.integer(canvasArea.y))
-        graph = getOrGenerateHexagon(canvasArea, hexagons, nodes, lines, hexagonSideLength, startInCanvas, Hexagon.Corners.BottomLeft, 0),
+        graph = generateGraph(canvasArea, hexagons, nodes, lines, hexagonSideLength, startInCanvas, Hexagon.Corners.BottomLeft, 0),
         api = {
             hexagons: hexagons,
             nodes: nodes,
