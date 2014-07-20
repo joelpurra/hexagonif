@@ -69,33 +69,37 @@ function grapher(canvasArea, hexagonSideLength) {
             // TODO: fix equality check
         } while (corner.rotation !== startCorner.rotation)
 
-        // TODO: base cache key on location index, so this check can be done much earlier
-        var hexagonCacheKey = hexagon.getCacheKey(),
-            cachedHexagon = hexagons[hexagonCacheKey];
+        // Hexagon
+        {
+            // TODO: base cache key on location index, so this check can be done much earlier.
+            // TODO: generate hexagons with neightbors instead of points, so the check is easier.
+            var hexagonCacheKey = hexagon.getCacheKey(),
+                cachedHexagon = hexagons[hexagonCacheKey];
 
-        if (cachedHexagon !== undefined) {
-            if (cachedHexagon.isComplete()) {
-                return cachedHexagon;
+            if (cachedHexagon !== undefined) {
+                if (cachedHexagon.isComplete()) {
+                    return cachedHexagon;
+                }
+
+                hexagon = cachedHexagon;
+            } else {
+                hexagons[hexagonCacheKey] = hexagon;
             }
 
-            hexagon = cachedHexagon;
-        } else {
-            hexagons[hexagonCacheKey] = hexagon;
-        }
+            // Wrote out .forEach loops over arrays to avoid too many function calls on the stack.
+            // Makes debugging the stack prettier, if nothing else.
+            {
+                var cornerPoints = hexagon.cornerPoints();
 
-        // Wrote out .forEach loops over arrays to avoid too many function calls on the stack.
-        // Makes debugging the stack prettier, if nothing else.
-        {
-            var cornerPoints = hexagon.cornerPoints();
+                for (var i = 0; i < cornerPoints.length; i++) {
+                    var cornerPoint = cornerPoints[i],
+                        connecting = Hexagon.Corners.connecting(cornerPoint.corner);
 
-            for (var i = 0; i < cornerPoints.length; i++) {
-                var cornerPoint = cornerPoints[i],
-                    connecting = Hexagon.Corners.connecting(cornerPoint.corner);
+                    for (var j = 0; j < connecting.length; j++) {
+                        var connected = connecting[j];
 
-                for (var j = 0; j < connecting.length; j++) {
-                    var connected = connecting[j];
-
-                    getOrGenerateHexagon(area, hexagons, nodes, lines, hexagonSideLength, cornerPoint.point, connected, depth + 1);
+                        getOrGenerateHexagon(area, hexagons, nodes, lines, hexagonSideLength, cornerPoint.point, connected, depth + 1);
+                    }
                 }
             }
         }
