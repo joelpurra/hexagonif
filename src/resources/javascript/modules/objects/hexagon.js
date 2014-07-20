@@ -215,9 +215,9 @@ Hexagon.prototype.getCacheKey = function() {
         var oppositeCorner = ( !! cornerPoint) && Hexagon.Corners.opposite(cornerPoint.corner),
             oppositeCornerPoint = ( !! oppositeCorner) && hexagon.getCornerPoint(oppositeCorner),
             line = oppositeCornerPoint && new Line(cornerPoint.point, oppositeCornerPoint.point),
-            center = line && line.center();
+            center = line && line.center;
 
-        centerCacheKey = center && center.getCacheKey();
+        centerCacheKey = center && center.cacheKey;
 
         if (centerCacheKey) {
             return true;

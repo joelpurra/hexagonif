@@ -26,7 +26,7 @@ function grapher(canvasArea, hexagonSideLength) {
         do {
             // Points and corners
             {
-                var pointCacheKey = point.getCacheKey(),
+                var pointCacheKey = point.cacheKey,
                     cachedPoint = nodes[pointCacheKey];
 
                 if (cachedPoint === undefined) {
@@ -48,13 +48,13 @@ function grapher(canvasArea, hexagonSideLength) {
             {
                 var line = new Line(point, nextPoint);
 
-                var lineCacheKey = line.getCacheKey(),
+                var lineCacheKey = line.cacheKey,
                     cachedLine = lines[lineCacheKey];
 
                 if (cachedLine === undefined) {
                     lines[lineCacheKey] = line;
                 } else {
-                    //throw new Error("Line already exists " + line.getCacheKey())
+                    //throw new Error("Line already exists " + line.cacheKey)
                     line = cachedLine;
                 }
 
