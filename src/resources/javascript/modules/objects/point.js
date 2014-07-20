@@ -1,7 +1,7 @@
 function Point(x, y) {
     this.x = x;
     this.y = y;
-    this.cacheKey = this._getCacheKey();
+    this.__getCacheKey = null;
 
     return this;
 }
@@ -12,6 +12,10 @@ Point.prototype._getCacheKey = function() {
         result = x + ", " + y;
 
     return result;
+};
+
+Point.prototype.getCacheKey = function() {
+    return (this.__getCacheKey || (this.__getCacheKey = this._getCacheKey()));
 };
 
 module.exports = Point;

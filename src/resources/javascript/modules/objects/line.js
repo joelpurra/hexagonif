@@ -3,15 +3,15 @@ var Point = require("./point.js");
 function Line(start, end) {
     this.start = start;
     this.end = end;
-    this.cacheKey = this._getCacheKey();
+    this.__getCacheKey = null;
     this.__center = null;
 
     return this;
 }
 
 Line.prototype._getCacheKey = function() {
-    var start = this.start.cacheKey,
-        end = this.end.cacheKey,
+    var start = this.start.getCacheKey(),
+        end = this.end.getCacheKey(),
         result;
 
     if (start < end) {
@@ -21,6 +21,10 @@ Line.prototype._getCacheKey = function() {
     }
 
     return result;
+};
+
+Line.prototype.getCacheKey = function() {
+    return (this.__getCacheKey || (this.__getCacheKey = this._getCacheKey()));
 };
 
 Line.prototype._center = function() {

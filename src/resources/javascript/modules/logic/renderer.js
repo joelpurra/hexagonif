@@ -139,14 +139,14 @@ function renderer(canvasId, canvasArea, lines) {
     canvas.scenes.load(sceneGrid);
 
     function highlightLine(line) {
-        var cacheKey = line.cacheKey,
+        var cacheKey = line.getCacheKey(),
             selected = graphicsLookupCache[cacheKey];
 
         lineHighlight.call(selected);
     }
 
     function resetLine(line) {
-        var cacheKey = line.cacheKey,
+        var cacheKey = line.getCacheKey(),
             selected = graphicsLookupCache[cacheKey];
 
         lineReset.call(selected);
@@ -173,7 +173,7 @@ function renderer(canvasId, canvasArea, lines) {
     }
 
     function unhighlightLine(line) {
-        var cacheKey = line.cacheKey,
+        var cacheKey = line.getCacheKey(),
             selected = graphicsLookupCache[cacheKey];
 
         lineUnhighlight.call(selected);

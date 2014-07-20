@@ -230,7 +230,7 @@ Hexagon.prototype.getLineThroughMiddle = function() {
 Hexagon.prototype.getCacheKey = function() {
     var lineThroughMiddle = this.getLineThroughMiddle(),
         center = lineThroughMiddle && lineThroughMiddle.center(),
-        centerCacheKey = center && center.cacheKey;
+        centerCacheKey = center && center.getCacheKey();
 
     return centerCacheKey || null;
 };
