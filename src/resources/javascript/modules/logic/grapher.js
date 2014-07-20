@@ -111,6 +111,7 @@ function addNeighbors(gonif) {
 
                 if ( !! sharedNeighbor) {
                     gonif.setNeighbor(sharedNeighborDirection.fromYou, sharedNeighbor);
+                    sharedNeighbor.setNeighbor(Hexagon.Sides.opposite(sharedNeighborDirection.fromYou), gonif);
                 }
             });
         }
@@ -143,16 +144,23 @@ function generateGraph(area, cache, hexagonSideLength) {
         startGonif = getOrGenerateGonif(cache, hexagonSideLength, point, Hexagon.Sides.Bottom),
         gonif = startGonif;
 
-    if (startGonif === null) {
-        startGonif = gonif;
-    }
+    generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.BottomRight);
+    generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.TopLeft);
 
-    // generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, startGonif, Hexagon.Sides.Top);
-    // generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, startGonif, Hexagon.Sides.TopRight);
-    generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, startGonif, Hexagon.Sides.BottomRight);
-    // generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, startGonif, Hexagon.Sides.Bottom);
-    // generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, startGonif, Hexagon.Sides.BottomLeft);
-    generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, startGonif, Hexagon.Sides.TopLeft);
+    do {
+        generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.Top);
+        generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.Bottom);
+        gonif = gonif.getNeighbor(Hexagon.Sides.BottomRight);
+    } while ( !! gonif);
+
+    gonif = startGonif.getNeighbor(Hexagon.Sides.TopLeft);
+
+    do {
+        generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.Top);
+        generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.Bottom);
+        gonif = gonif.getNeighbor(Hexagon.Sides.TopLeft);
+    } while ( !! gonif);
+
 
     console.log({
         hexagons: Object.keys(cache.hexagons).length,
