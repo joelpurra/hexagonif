@@ -27,55 +27,55 @@ Gonif.Neighbors.getSharedNeighborDirections = function(direction) {
         case Hexagon.Sides.Top:
             result = [{
                 fromNeighbor: Hexagon.Sides.BottomLeft,
-                fromYou: Hexagon.Sides.TopLeft
+                fromHere: Hexagon.Sides.TopLeft
             }, {
                 fromNeighbor: Hexagon.Sides.BottomRight,
-                fromYou: Hexagon.Sides.TopRight
+                fromHere: Hexagon.Sides.TopRight
             }];
             break;
         case Hexagon.Sides.TopRight:
             result = [{
                 fromNeighbor: Hexagon.Sides.TopLeft,
-                fromYou: Hexagon.Sides.Top
+                fromHere: Hexagon.Sides.Top
             }, {
                 fromNeighbor: Hexagon.Sides.Bottom,
-                fromYou: Hexagon.Sides.BottomRight
+                fromHere: Hexagon.Sides.BottomRight
             }];
             break;
         case Hexagon.Sides.BottomRight:
             result = [{
                 fromNeighbor: Hexagon.Sides.Top,
-                fromYou: Hexagon.Sides.TopRight
+                fromHere: Hexagon.Sides.TopRight
             }, {
                 fromNeighbor: Hexagon.Sides.BottomLeft,
-                fromYou: Hexagon.Sides.Bottom
+                fromHere: Hexagon.Sides.Bottom
             }];
             break;
         case Hexagon.Sides.Bottom:
             result = [{
                 fromNeighbor: Hexagon.Sides.TopRight,
-                fromYou: Hexagon.Sides.BottomRight
+                fromHere: Hexagon.Sides.BottomRight
             }, {
                 fromNeighbor: Hexagon.Sides.TopLeft,
-                fromYou: Hexagon.Sides.BottomLeft
+                fromHere: Hexagon.Sides.BottomLeft
             }];
             break;
         case Hexagon.Sides.BottomLeft:
             result = [{
                 fromNeighbor: Hexagon.Sides.BottomRight,
-                fromYou: Hexagon.Sides.Bottom
+                fromHere: Hexagon.Sides.Bottom
             }, {
                 fromNeighbor: Hexagon.Sides.Top,
-                fromYou: Hexagon.Sides.TopLeft
+                fromHere: Hexagon.Sides.TopLeft
             }];
             break;
         case Hexagon.Sides.TopLeft:
             result = [{
                 fromNeighbor: Hexagon.Sides.Bottom,
-                fromYou: Hexagon.Sides.BottomLeft
+                fromHere: Hexagon.Sides.BottomLeft
             }, {
                 fromNeighbor: Hexagon.Sides.TopRight,
-                fromYou: Hexagon.Sides.Top
+                fromHere: Hexagon.Sides.Top
             }];
             break;
         default:

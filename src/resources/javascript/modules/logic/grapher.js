@@ -97,10 +97,10 @@ function getOrGenerateGonif(cache, hexagonSideLength, startPoint, startSide) {
 }
 
 function addNeighbors(gonif) {
-    var startSide = Hexagon.Sides.Top,
-        side = startSide;
+    var sidesToCheck = Hexagon.Sides.all(),
+        sideCounter = 0;
 
-    do {
+    while (side = sidesToCheck.shift()) {
         var neighbor = gonif.getNeighbor(side);
 
         if ( !! neighbor) {
@@ -109,58 +109,97 @@ function addNeighbors(gonif) {
             sharedNeighborDirections.forEach(function(sharedNeighborDirection) {
                 var sharedNeighbor = neighbor.getNeighbor(sharedNeighborDirection.fromNeighbor);
 
-                if ( !! sharedNeighbor) {
-                    gonif.setNeighbor(sharedNeighborDirection.fromYou, sharedNeighbor);
-                    sharedNeighbor.setNeighbor(Hexagon.Sides.opposite(sharedNeighborDirection.fromYou), gonif);
+                if (( !! sharedNeighbor) && gonif.getNeighbor(sharedNeighborDirection.fromHere) !== sharedNeighbor) {
+                    gonif.setNeighbor(sharedNeighborDirection.fromHere, sharedNeighbor);
+                    sharedNeighbor.setNeighbor(Hexagon.Sides.opposite(sharedNeighborDirection.fromHere), gonif);
+
+                    // In case this one has neighbors still unknown, but already checked in the inital pass.
+                    sidesToCheck.push(sharedNeighborDirection.fromHere);
+                    sideCounter++
                 }
             });
         }
-
-        side = Hexagon.Sides.next(side);
-
-        // TODO: fix equality check
-    } while (side.name !== startSide.name)
+    }
+    console.log("sideCounter", sideCounter);
 }
 
-function generateGonifInDirection(area, cache, hexagonSideLength, gonif, goingTowardsDirection) {
-    var comingFromDirection = Hexagon.Sides.opposite(goingTowardsDirection),
+function generateGonifInDirection(area, cache, hexagonSideLength, gonif, goingTowardsDirections) {
+    // Ensure array
+    goingTowardsDirections = [].concat(goingTowardsDirections);
+
+    var comingFromDirection,
+        goingTowardsDirectionIndex = 0,
+        goingTowardsDirection = goingTowardsDirections[goingTowardsDirectionIndex],
         startPoint = gonif.hexagon.getCornerPoint(goingTowardsDirection.end).point,
         neighbor;
 
-    while (area.isInside(startPoint)) {
+    do {
+        comingFromDirection = Hexagon.Sides.opposite(goingTowardsDirection);
         startPoint = gonif.hexagon.getCornerPoint(goingTowardsDirection.end).point;
         neighbor = getOrGenerateGonif(cache, hexagonSideLength, startPoint, comingFromDirection);
+
         gonif.setNeighbor(goingTowardsDirection, neighbor);
         neighbor.setNeighbor(comingFromDirection, gonif);
         addNeighbors(neighbor);
+
+        goingTowardsDirectionIndex = (goingTowardsDirectionIndex + 1) % goingTowardsDirections.length;
+        goingTowardsDirection = goingTowardsDirections[goingTowardsDirectionIndex];
         gonif = neighbor;
-    }
+    } while (area.isInside(startPoint))
+}
+
+function addAreaLines(cache, areaWithPadding) {
+    var p1 = new Point(areaWithPadding.aX, areaWithPadding.aY),
+        p2 = new Point(areaWithPadding.aX, areaWithPadding.bY),
+        p3 = new Point(areaWithPadding.bX, areaWithPadding.aY),
+        p4 = new Point(areaWithPadding.bX, areaWithPadding.bY),
+        l1 = new Line(p1, p2),
+        l2 = new Line(p1, p3),
+        l3 = new Line(p2, p4),
+        l4 = new Line(p3, p4);
+
+    [l1, l2, l3, l4].forEach(function(line) {
+            cache.lines[line.cacheKey] = line;
+        });
 }
 
 function generateGraph(area, cache, hexagonSideLength) {
-    var areaWithPadding = new Area(new Point(0 - hexagonSideLength, 0 - hexagonSideLength), new Point(area.x + hexagonSideLength, area.y + hexagonSideLength)),
-        startPoint = new Point(random.integer(area.x), random.integer(area.y)),
+    var areaWithoutPadding = new Area(new Point(0, 0), area),
+        areaWithPadding = new Area(new Point(0 + hexagonSideLength, 0 + hexagonSideLength), new Point(area.x - hexagonSideLength, area.y - hexagonSideLength)),
+        areaWithMorePadding = new Area(new Point(0 + 2 * hexagonSideLength, 0 + 2 * hexagonSideLength), new Point(area.x - 2 * hexagonSideLength, area.y - 2 * hexagonSideLength)),
+        // areaWithPadding = new Area(new Point(0 - hexagonSideLength, 0 - hexagonSideLength), new Point(area.x + hexagonSideLength, area.y + hexagonSideLength)),
+        startPoint = new Point(area.x / 2, area.y / 2),
+        // startPoint = new Point((areaWithPadding.aX + areaWithPadding.bX) / 2, (areaWithPadding.aY + areaWithPadding.bY) / 2);
+        // startPoint = new Point(hexagonSideLength + areaWithPadding.aX + random.integer(areaWithPadding.bX - hexagonSideLength) - hexagonSideLength, hexagonSideLength + areaWithPadding.aY + random.integer(areaWithPadding.bY - hexagonSideLength)),
+        // startPoint = new Point(random.integer(area.x), random.integer(area.y)),
         point = startPoint,
         startGonif = getOrGenerateGonif(cache, hexagonSideLength, point, Hexagon.Sides.Bottom),
         gonif = startGonif;
 
-    generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.BottomRight);
-    generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.TopLeft);
+    generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, [Hexagon.Sides.BottomRight, Hexagon.Sides.TopRight]);
+    generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, [Hexagon.Sides.BottomLeft, Hexagon.Sides.TopLeft]);
+    // generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.BottomRight);
+    // generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.TopLeft);
 
     do {
         generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.Top);
         generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.Bottom);
-        gonif = gonif.getNeighbor(Hexagon.Sides.BottomRight);
+        gonif = gonif.getNeighbor(Hexagon.Sides.BottomRight) || gonif.getNeighbor(Hexagon.Sides.TopRight);
     } while ( !! gonif);
 
-    gonif = startGonif.getNeighbor(Hexagon.Sides.TopLeft);
+    gonif = startGonif.getNeighbor(Hexagon.Sides.BottomLeft) || startGonif.getNeighbor(Hexagon.Sides.TopLeft);
 
-    do {
-        generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.Top);
-        generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.Bottom);
-        gonif = gonif.getNeighbor(Hexagon.Sides.TopLeft);
-    } while ( !! gonif);
+    if ( !! gonif) {
+        do {
+            generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.Top);
+            generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.Bottom);
+            gonif = gonif.getNeighbor(Hexagon.Sides.BottomLeft) || gonif.getNeighbor(Hexagon.Sides.TopLeft);
+        } while ( !! gonif);
+    }
 
+    addAreaLines(cache, areaWithoutPadding);
+    addAreaLines(cache, areaWithPadding);
+    addAreaLines(cache, areaWithMorePadding);
 
     console.log({
         hexagons: Object.keys(cache.hexagons).length,

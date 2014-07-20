@@ -155,6 +155,17 @@ Hexagon.Sides = {
     TopLeft: new Side("top left", Hexagon.Corners.Left, Hexagon.Corners.TopLeft),
 };
 
+Hexagon.Sides.all = function() {
+    return [
+        Hexagon.Sides.Top,
+        Hexagon.Sides.TopRight,
+        Hexagon.Sides.BottomRight,
+        Hexagon.Sides.Bottom,
+        Hexagon.Sides.BottomLeft,
+        Hexagon.Sides.TopLeft
+    ];
+}
+
 Hexagon.Sides.next = function(start) {
     var result;
 
