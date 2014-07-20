@@ -207,24 +207,30 @@ Hexagon.Sides.fromCorner = function(start) {
     return result;
 };
 
-Hexagon.prototype.getCacheKey = function() {
-    var centerCacheKey,
+Hexagon.prototype.getLineThroughMiddle = function() {
+    var line,
         hexagon = this;
 
-    this.cornerPoints().slice(0, 2).some(function(cornerPoint) {
+    this.cornerPoints().slice(0, 2).some(function findTwoOpposingCorners(cornerPoint) {
         var oppositeCorner = ( !! cornerPoint) && Hexagon.Corners.opposite(cornerPoint.corner),
-            oppositeCornerPoint = ( !! oppositeCorner) && hexagon.getCornerPoint(oppositeCorner),
-            line = oppositeCornerPoint && new Line(cornerPoint.point, oppositeCornerPoint.point),
-            center = line && line.center;
+            oppositeCornerPoint = ( !! oppositeCorner) && hexagon.getCornerPoint(oppositeCorner);
 
-        centerCacheKey = center && center.cacheKey;
+        line = oppositeCornerPoint && new Line(cornerPoint.point, oppositeCornerPoint.point);
 
-        if (centerCacheKey) {
+        if (line) {
             return true;
         }
 
         return false;
     });
+
+    return line || null;
+}
+
+Hexagon.prototype.getCacheKey = function() {
+    var lineThroughMiddle = this.getLineThroughMiddle(),
+        center = lineThroughMiddle && lineThroughMiddle.center,
+        centerCacheKey = center && center.cacheKey;
 
     return centerCacheKey || null;
 };
