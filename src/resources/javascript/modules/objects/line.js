@@ -4,7 +4,7 @@ function Line(start, end) {
     this.start = start;
     this.end = end;
     this.cacheKey = this._getCacheKey();
-    this.center = this._center();
+    this.__center = null;
 
     return this;
 }
@@ -29,6 +29,10 @@ Line.prototype._center = function() {
         result = new Point(x, y);
 
     return result;
+};
+
+Line.prototype.center = function() {
+    return (this.__center || (this.__center = this._center()));
 };
 
 module.exports = Line;
