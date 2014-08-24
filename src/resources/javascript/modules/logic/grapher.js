@@ -97,30 +97,27 @@ function getOrGenerateGonif(cache, hexagonSideLength, startPoint, startSide) {
 }
 
 function addNeighbors(gonif) {
-    var sidesToCheck = Hexagon.Sides.all(),
-        sideCounter = 0;
+    var sidesToCheck = Hexagon.Sides.all();
 
     while (side = sidesToCheck.shift()) {
         var neighbor = gonif.getNeighbor(side);
 
-        if ( !! neighbor) {
+        if (!!neighbor) {
             var sharedNeighborDirections = Gonif.Neighbors.getSharedNeighborDirections(side);
 
             sharedNeighborDirections.forEach(function(sharedNeighborDirection) {
                 var sharedNeighbor = neighbor.getNeighbor(sharedNeighborDirection.fromNeighbor);
 
-                if (( !! sharedNeighbor) && gonif.getNeighbor(sharedNeighborDirection.fromHere) !== sharedNeighbor) {
+                if ((!!sharedNeighbor) && gonif.getNeighbor(sharedNeighborDirection.fromHere) !== sharedNeighbor) {
                     gonif.setNeighbor(sharedNeighborDirection.fromHere, sharedNeighbor);
                     sharedNeighbor.setNeighbor(Hexagon.Sides.opposite(sharedNeighborDirection.fromHere), gonif);
 
                     // In case this one has neighbors still unknown, but already checked in the inital pass.
                     sidesToCheck.push(sharedNeighborDirection.fromHere);
-                    sideCounter++
                 }
             });
         }
     }
-    console.log("sideCounter", sideCounter);
 }
 
 function generateGonifInDirection(area, cache, hexagonSideLength, gonif, goingTowardsDirections) {
@@ -148,76 +145,49 @@ function generateGonifInDirection(area, cache, hexagonSideLength, gonif, goingTo
     } while (area.isInside(startPoint))
 }
 
-function addAreaLines(cache, areaWithPadding) {
-    var p1 = new Point(areaWithPadding.aX, areaWithPadding.aY),
-        p2 = new Point(areaWithPadding.aX, areaWithPadding.bY),
-        p3 = new Point(areaWithPadding.bX, areaWithPadding.aY),
-        p4 = new Point(areaWithPadding.bX, areaWithPadding.bY),
-        l1 = new Line(p1, p2),
-        l2 = new Line(p1, p3),
-        l3 = new Line(p2, p4),
-        l4 = new Line(p3, p4);
-
-    [l1, l2, l3, l4].forEach(function(line) {
-            cache.lines[line.cacheKey] = line;
-        });
-}
-
 function generateGraph(area, cache, hexagonSideLength) {
-    var areaWithoutPadding = new Area(new Point(0, 0), area),
-        areaWithPadding = new Area(new Point(0 + hexagonSideLength, 0 + hexagonSideLength), new Point(area.x - hexagonSideLength, area.y - hexagonSideLength)),
-        areaWithMorePadding = new Area(new Point(0 + 2 * hexagonSideLength, 0 + 2 * hexagonSideLength), new Point(area.x - 2 * hexagonSideLength, area.y - 2 * hexagonSideLength)),
-        // areaWithPadding = new Area(new Point(0 - hexagonSideLength, 0 - hexagonSideLength), new Point(area.x + hexagonSideLength, area.y + hexagonSideLength)),
+    var areaWithPadding = new Area(new Point(0 - hexagonSideLength, 0 - hexagonSideLength), new Point(area.x + hexagonSideLength, area.y + hexagonSideLength)),
         startPoint = new Point(area.x / 2, area.y / 2),
-        // startPoint = new Point((areaWithPadding.aX + areaWithPadding.bX) / 2, (areaWithPadding.aY + areaWithPadding.bY) / 2);
-        // startPoint = new Point(hexagonSideLength + areaWithPadding.aX + random.integer(areaWithPadding.bX - hexagonSideLength) - hexagonSideLength, hexagonSideLength + areaWithPadding.aY + random.integer(areaWithPadding.bY - hexagonSideLength)),
-        // startPoint = new Point(random.integer(area.x), random.integer(area.y)),
         point = startPoint,
         startGonif = getOrGenerateGonif(cache, hexagonSideLength, point, Hexagon.Sides.Bottom),
         gonif = startGonif;
 
+    // Generate horizontally first /\/\/\/\/\/.
+    // To the east.
     generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, [Hexagon.Sides.BottomRight, Hexagon.Sides.TopRight]);
+    // To the west.
     generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, [Hexagon.Sides.BottomLeft, Hexagon.Sides.TopLeft]);
-    // generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.BottomRight);
-    // generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.TopLeft);
 
+    // Generate vertically, based on neighbors from the first gonif.
+    // Generate based on neighbors to the east.
     do {
         generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.Top);
         generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.Bottom);
         gonif = gonif.getNeighbor(Hexagon.Sides.BottomRight) || gonif.getNeighbor(Hexagon.Sides.TopRight);
-    } while ( !! gonif);
+    } while (!!gonif);
 
+    // Start from left neighbor of the first gonif.
     gonif = startGonif.getNeighbor(Hexagon.Sides.BottomLeft) || startGonif.getNeighbor(Hexagon.Sides.TopLeft);
 
-    if ( !! gonif) {
+    // Generate based on neighbors to the west.
+    if (!!gonif) {
         do {
             generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.Top);
             generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.Bottom);
             gonif = gonif.getNeighbor(Hexagon.Sides.BottomLeft) || gonif.getNeighbor(Hexagon.Sides.TopLeft);
-        } while ( !! gonif);
+        } while (!!gonif);
     }
-
-    addAreaLines(cache, areaWithoutPadding);
-    addAreaLines(cache, areaWithPadding);
-    addAreaLines(cache, areaWithMorePadding);
-
-    console.log({
-        hexagons: Object.keys(cache.hexagons).length,
-        nodes: Object.keys(cache.nodes).length,
-        lines: Object.keys(cache.lines).length,
-        gonifs: Object.keys(cache.gonifs).length,
-    }, cache)
 
     return startGonif;
 }
 
 function grapher(canvasArea, hexagonSideLength) {
     var cache = {
-        hexagons: {},
-        nodes: {},
-        lines: {},
-        gonifs: {},
-    },
+            hexagons: {},
+            nodes: {},
+            lines: {},
+            gonifs: {},
+        },
         start = generateGraph(canvasArea, cache, hexagonSideLength),
         graph = {
             hexagons: cache.hexagons,
