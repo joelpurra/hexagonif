@@ -53,7 +53,7 @@
 
     function calculateHexagonSideLength() {
         var canvas = getCanvas(),
-            absoluteMin = 50,
+            absoluteMin = 75,
             absoluteMax = 150,
             shortestCanvasSide = Math.min(canvas.scrollWidth, canvas.scrollHeight),
             min = Math.max(absoluteMin, shortestCanvasSide / 20),
@@ -233,8 +233,8 @@
         // Experimental code to detect if a mouse pointing device is used.
         // If a mouse is detected, call the supplied function once.
         var onTouchMoveEventArgs = {
-            target: null,
-        },
+                target: null,
+            },
             onTouchMove = function(e) {
                 onTouchMoveEventArgs.target = e.target;
             },

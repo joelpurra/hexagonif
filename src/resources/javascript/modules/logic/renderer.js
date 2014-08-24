@@ -12,19 +12,20 @@ function renderer(canvasId, canvasArea, lines) {
     var hexEvent = new HexEvent(canvasElement);
 
     var canvas = oCanvas.create({
-        canvas: "#" + canvasId
-    }),
+            canvas: "#" + canvasId
+        }),
         graphicsLookupCache = {};
 
     function getDefaultStrokeWidth() {
         // TODO: move to options object
-        return 10;
-        // return random.integer(1, 10);
+        // return 10;
+        return random.integer(3, 10);
     }
 
     function getDefaultStrokeColor() {
         // TODO: move to options object
         // return "rgba(0, 0, 0, 0.01)";
+        // return "rgba(0, 0, 0, 0.1)";
         return "transparent";
     }
 
