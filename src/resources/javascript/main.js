@@ -8,7 +8,9 @@
         profiling = require("./modules/utils/profiling.js"),
         random = require("./modules/utils/random.js"),
         HexEvent = require("./modules/logic/events.js"),
-        ActivityMonitor = require("./modules/logic/activity-monitor.js");
+        ActivityMonitor = require("./modules/logic/activity-monitor.js"),
+        GraphObjectsTool = require("./modules/logic/graph-objects-tool.js"),
+        HighlightOnInterval = require("./modules/logic/highlight-on-interval.js");
 
     var canvasId = "hexagonif",
         canvasContainerId = "hexagonif-container";
@@ -70,107 +72,12 @@
                 return grapher(canvasArea, hexagonSideLength);
             }),
             graphObjects = profiledGrapher(),
+            graphObjectsTool = new GraphObjectsTool(graphObjects),
             profiledRenderer = profiling.wrap("renderer", function profiledRendererWrapper() {
                 return renderer(canvasId, canvasArea, graphObjects.lines);
             }),
             hexEvent = new HexEvent(canvas),
             activityMonitor = new ActivityMonitor(hexEvent),
-            getRandomObject = function(objects) {
-                var keys = Object.keys(objects),
-                    count = keys.length,
-                    rnd = random.integer(0, count),
-                    key = keys[rnd],
-                    object = objects[key];
-
-                return object;
-            },
-            getRandomHexagon = function() {
-                var hexagon = getRandomObject(graphObjects.hexagons);
-
-                return hexagon;
-            },
-            getRandomLine = function() {
-                var line = getRandomObject(graphObjects.lines);
-
-                return line;
-            },
-            getRandomNode = function() {
-                var node = getRandomObject(graphObjects.nodes);
-
-                return node;
-            },
-            highlightOnInterval = function() {
-                var MAX_AUTO_HIGHLIGHT_DELAY = 10,
-                    highlightCounter = 0,
-                    highlightCounterInterval,
-                    isAutomatedHighlight = false,
-                    highlightInterval;
-
-                function highlightCounterDecreaser() {
-                    highlightCounter = Math.max(0, highlightCounter - 1);
-                }
-
-                hexEvent.listen("line.highlight", function hexagonifLineHighlightEventListener() {
-                    if (!isAutomatedHighlight) {
-                        highlightCounter = Math.min(Number.MAX_VALUE - 1, highlightCounter + 1, MAX_AUTO_HIGHLIGHT_DELAY);
-                    }
-                });
-
-                hexEvent.listen("line.unhighlight", function hexagonifLineUnhighlightEventListener() {
-                    // Something
-                });
-
-                function resetRandomLine() {
-                    var line = getRandomLine();
-
-                    scene.resetLine(line);
-                }
-
-                function highlightRandomLine() {
-                    var line = getRandomLine();
-
-                    isAutomatedHighlight = true;
-                    scene.highlightLine(line);
-                    isAutomatedHighlight = false;
-
-                    setTimeout(function unhighlightSameRandomLine() {
-                        scene.unhighlightLine(line);
-                    }, 500);
-                }
-
-                function highlightRandomHexagon() {
-                    var hexagon;
-
-                    do {
-                        hexagon = getRandomHexagon();
-                    } while (!hexagon.isComplete())
-
-                    isAutomatedHighlight = true;
-                    scene.highlightHexagon(hexagon);
-                    isAutomatedHighlight = false;
-
-                    setTimeout(function unhighlightSameRandomHexagon() {
-                        scene.unhighlightHexagon(hexagon);
-                    }, 500);
-                }
-
-                function highlightSomethingThatIfNothingHasHappened() {
-                    var rnd = random.integer(10);
-
-                    if (highlightCounter === 0) {
-                        if (rnd < 2) {
-                            resetRandomLine();
-                        } else if (rnd < 9) {
-                            highlightRandomLine();
-                        } else {
-                            highlightRandomHexagon();
-                        }
-                    }
-                }
-
-                highlightCounterInterval = setInterval(highlightCounterDecreaser, 1000);
-                highlightInterval = setInterval(highlightSomethingThatIfNothingHasHappened, 1000);
-            },
             addGonifNeighborDebugLines = function() {
                 Object.keys(graphObjects.gonifs).forEach(function(gonifKey) {
                     var gonif = graphObjects.gonifs[gonifKey],
@@ -201,20 +108,24 @@
                 hexEvent.listen("user.activity", function() {
                     // TODO DEBUG REMOVE
                     console.log("User activity!");
+                    highlightOnInterval.isStarted() || highlightOnInterval.start();
                 });
                 hexEvent.listen("user.inactivity", function() {
                     // TODO DEBUG REMOVE
                     console.log("User inactivity!");
+                    highlightOnInterval.isStarted() && highlightOnInterval.stop();
                 });
+
                 activityMonitor.start();
             },
-            scene;
+            scene,
+            highlightOnInterval;
 
         // addGonifNeighborDebugLines();
 
         scene = profiledRenderer();
+        highlightOnInterval = new HighlightOnInterval(scene, graphObjectsTool, hexEvent);
         setupActivityMonitor();
-        highlightOnInterval();
     }
 
     function once(fn) {
