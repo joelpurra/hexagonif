@@ -2,6 +2,7 @@
     "use strict";
 
     var Point = require("./modules/objects/point.js"),
+        Line = require("./modules/objects/line.js"),
         grapher = require("./modules/logic/grapher.js"),
         renderer = require("./modules/logic/renderer.js"),
         profiling = require("./modules/utils/profiling.js"),
@@ -166,7 +167,37 @@
                 highlightCounterInterval = setInterval(highlightCounterDecreaser, 1000);
                 highlightInterval = setInterval(highlightSomethingThatIfNothingHasHappened, 1000);
             },
-            scene = profiledRenderer();
+            addGonifNeighborDebugLines = function() {
+                Object.keys(graphObjects.gonifs).forEach(function(gonifKey) {
+                    var gonif = graphObjects.gonifs[gonifKey],
+                        fromLine = gonif.hexagon.getLineThroughMiddle(),
+                        fromCenter = fromLine && fromLine.center();
+
+                    if (!fromCenter) {
+                        return;
+                    }
+
+                    gonif.getNeighbors().forEach(function(neighbor) {
+                        if (neighbor) {
+                            var toLine = neighbor.hexagon.getLineThroughMiddle(),
+                                toCenter = toLine && toLine.center();
+
+                            if (!toCenter) {
+                                return;
+                            }
+
+                            var line = new Line(fromCenter, toCenter);
+
+                            graphObjects.lines[line.cacheKey] = line;
+                        }
+                    });
+                });
+            },
+            scene;
+
+        // addGonifNeighborDebugLines();
+
+        scene = profiledRenderer();
 
         highlightOnInterval();
     }

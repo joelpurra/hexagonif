@@ -35,6 +35,12 @@ Hexagon.Corners = {
     Left: new Corner("left", 180),
 };
 
+Object.keys(Hexagon.Corners).forEach(function(cornerKey) {
+    var corner = Hexagon.Corners[cornerKey];
+
+    corner.rad = (((corner.rotation + 60) / 180) % 360) * Math.PI;
+});
+
 Hexagon.Corners.next = function(start) {
     var result;
 
@@ -149,6 +155,17 @@ Hexagon.Sides = {
     TopLeft: new Side("top left", Hexagon.Corners.Left, Hexagon.Corners.TopLeft),
 };
 
+Hexagon.Sides.all = function() {
+    return [
+        Hexagon.Sides.Top,
+        Hexagon.Sides.TopRight,
+        Hexagon.Sides.BottomRight,
+        Hexagon.Sides.Bottom,
+        Hexagon.Sides.BottomLeft,
+        Hexagon.Sides.TopLeft
+    ];
+}
+
 Hexagon.Sides.next = function(start) {
     var result;
 
@@ -170,6 +187,35 @@ Hexagon.Sides.next = function(start) {
             break;
         case Hexagon.Sides.TopLeft:
             result = Hexagon.Sides.Top;
+            break;
+        default:
+            throw new Error("Unknown start side " + start);
+    }
+
+    return result;
+};
+
+Hexagon.Sides.opposite = function(start) {
+    var result;
+
+    switch (start) {
+        case Hexagon.Sides.Top:
+            result = Hexagon.Sides.Bottom;
+            break;
+        case Hexagon.Sides.TopRight:
+            result = Hexagon.Sides.BottomLeft;
+            break;
+        case Hexagon.Sides.BottomRight:
+            result = Hexagon.Sides.TopLeft;
+            break;
+        case Hexagon.Sides.Bottom:
+            result = Hexagon.Sides.Top;
+            break;
+        case Hexagon.Sides.BottomLeft:
+            result = Hexagon.Sides.TopRight;
+            break;
+        case Hexagon.Sides.TopLeft:
+            result = Hexagon.Sides.BottomRight;
             break;
         default:
             throw new Error("Unknown start side " + start);
