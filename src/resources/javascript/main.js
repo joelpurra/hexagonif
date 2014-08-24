@@ -167,7 +167,7 @@
                 highlightCounterInterval = setInterval(highlightCounterDecreaser, 1000);
                 highlightInterval = setInterval(highlightSomethingThatIfNothingHasHappened, 1000);
             },
-            addGonifLines = function() {
+            addGonifNeighborDebugLines = function() {
                 Object.keys(graphObjects.gonifs).forEach(function(gonifKey) {
                     var gonif = graphObjects.gonifs[gonifKey],
                         fromLine = gonif.hexagon.getLineThroughMiddle(),
@@ -194,7 +194,8 @@
                 });
             },
             scene;
-        addGonifLines();
+
+        // addGonifNeighborDebugLines();
 
         scene = profiledRenderer();
 
