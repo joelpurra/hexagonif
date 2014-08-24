@@ -1,12 +1,15 @@
 function renderer(canvasId, canvasArea, lines) {
     var random = require("../utils/random.js"),
-        Hexagon = require("../objects/hexagon.js");
+        Hexagon = require("../objects/hexagon.js"),
+        HexEvent = require("./events.js");
 
     // TODO: use hidpi-canvas-polyfill
     // https://github.com/jondavidjohn/hidpi-canvas-polyfill
     var canvasElement = document.getElementById(canvasId);
     canvasElement.width = canvasArea.x;
     canvasElement.height = canvasArea.y;
+
+    var hexEvent = new HexEvent(canvasElement);
 
     var canvas = oCanvas.create({
         canvas: "#" + canvasId
@@ -42,15 +45,6 @@ function renderer(canvasId, canvasArea, lines) {
         strokeColor: getDefaultStrokeColor(),
     });
 
-    function fire(name, graphic, object) {
-        // TODO: custom event structure
-        var event = document.createEvent('HTMLEvents');
-        event.initEvent('hexagonif.' + name, true, true);
-        event.graphic = graphic;
-        event.object = object;
-        return canvasElement.dispatchEvent(event);
-    }
-
     function onLineMouseEnter(event) {
         lineHighlight.call(this);
     }
@@ -60,7 +54,7 @@ function renderer(canvasId, canvasArea, lines) {
     }
 
     function lineReset() {
-        var lineEvent = fire("line.reset", this, this.tag);
+        var lineEvent = hexEvent.fire("line.reset", this, this.tag);
 
         if (lineEvent.defaultPrevented) {
             return;
@@ -72,7 +66,7 @@ function renderer(canvasId, canvasArea, lines) {
     }
 
     function lineHighlight() {
-        var lineEvent = fire("line.highlight", this, this.tag);
+        var lineEvent = hexEvent.fire("line.highlight", this, this.tag);
 
         if (lineEvent.defaultPrevented) {
             return;
@@ -84,7 +78,7 @@ function renderer(canvasId, canvasArea, lines) {
     }
 
     function lineUnhighlight(event) {
-        var lineEvent = fire("line.unhighlight", this, this.tag);
+        var lineEvent = hexEvent.fire("line.unhighlight", this, this.tag);
 
         if (lineEvent.defaultPrevented) {
             return;

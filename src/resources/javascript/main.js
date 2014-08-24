@@ -6,7 +6,9 @@
         grapher = require("./modules/logic/grapher.js"),
         renderer = require("./modules/logic/renderer.js"),
         profiling = require("./modules/utils/profiling.js"),
-        random = require("./modules/utils/random.js");
+        random = require("./modules/utils/random.js"),
+        HexEvent = require("./modules/logic/events.js"),
+        ActivityMonitor = require("./modules/logic/activity-monitor.js");
 
     var canvasId = "hexagonif",
         canvasContainerId = "hexagonif-container";
@@ -71,6 +73,8 @@
             profiledRenderer = profiling.wrap("renderer", function profiledRendererWrapper() {
                 return renderer(canvasId, canvasArea, graphObjects.lines);
             }),
+            hexEvent = new HexEvent(canvas),
+            activityMonitor = new ActivityMonitor(hexEvent),
             getRandomObject = function(objects) {
                 var keys = Object.keys(objects),
                     count = keys.length,
@@ -106,13 +110,13 @@
                     highlightCounter = Math.max(0, highlightCounter - 1);
                 }
 
-                document.addEventListener("hexagonif.line.highlight", function hexagonifLineHighlightEventListener() {
+                hexEvent.listen("line.highlight", function hexagonifLineHighlightEventListener() {
                     if (!isAutomatedHighlight) {
                         highlightCounter = Math.min(Number.MAX_VALUE - 1, highlightCounter + 1, MAX_AUTO_HIGHLIGHT_DELAY);
                     }
                 });
 
-                document.addEventListener("hexagonif.line.unhighlight", function hexagonifLineUnhighlightEventListener() {
+                hexEvent.listen("line.unhighlight", function hexagonifLineUnhighlightEventListener() {
                     // Something
                 });
 
@@ -193,12 +197,23 @@
                     });
                 });
             },
+            setupActivityMonitor = function() {
+                hexEvent.listen("user.activity", function() {
+                    // TODO DEBUG REMOVE
+                    console.log("User activity!");
+                });
+                hexEvent.listen("user.inactivity", function() {
+                    // TODO DEBUG REMOVE
+                    console.log("User inactivity!");
+                });
+                activityMonitor.start();
+            },
             scene;
 
         // addGonifNeighborDebugLines();
 
         scene = profiledRenderer();
-
+        setupActivityMonitor();
         highlightOnInterval();
     }
 
