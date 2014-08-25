@@ -93,18 +93,27 @@
                 });
             },
             setupActivityMonitor = function() {
+                function startActivities() {
+                    highlightOnInterval.isStarted() || highlightOnInterval.start();
+                }
+
+                function stopActivities() {
+                    highlightOnInterval.isStarted() && highlightOnInterval.stop();
+                }
+
                 hexEvent.listen("user.activity", function() {
                     // TODO DEBUG REMOVE
                     console.log("User activity!");
-                    highlightOnInterval.isStarted() || highlightOnInterval.start();
+                    startActivities();
                 });
                 hexEvent.listen("user.inactivity", function() {
                     // TODO DEBUG REMOVE
                     console.log("User inactivity!");
-                    highlightOnInterval.isStarted() && highlightOnInterval.stop();
+                    stopActivities();
                 });
 
                 activityMonitor.start();
+                startActivities();
             },
             scene,
             highlightOnInterval;
