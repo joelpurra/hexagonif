@@ -42,6 +42,9 @@
     }
 
     function calculateHexagonSideLength() {
+        // TODO DEBUG REMOVE
+        return 100;
+
         var canvas = getCanvas(),
             absoluteMin = 75,
             absoluteMax = 150,
@@ -62,15 +65,14 @@
             graphObjects = profiledGrapher(),
             graphObjectsTool = new GraphObjectsTool(graphObjects),
             profiledRenderer = profiling.wrap("renderer", function profiledRendererWrapper() {
-                return renderer(canvasId, canvasArea, graphObjects.lines);
+                return renderer(canvasId, canvasArea, graphObjects);
             }),
             hexEvent = new HexEvent(canvas),
             activityMonitor = new ActivityMonitor(hexEvent),
             addGonifNeighborDebugLines = function() {
                 Object.keys(graphObjects.gonifs).forEach(function(gonifKey) {
                     var gonif = graphObjects.gonifs[gonifKey],
-                        fromLine = gonif.hexagon.getLineThroughMiddle(),
-                        fromCenter = fromLine && fromLine.center();
+                        fromCenter = gonif.hexagon.getCenter();
 
                     if (!fromCenter) {
                         return;
