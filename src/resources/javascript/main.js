@@ -7,6 +7,10 @@
         renderer = require("./modules/logic/renderer.js"),
         profiling = require("./modules/utils/profiling.js"),
         random = require("./modules/utils/random.js"),
+        resizeDetector = require("./modules/utils/resize-detector.js"),
+        mouseDetector = require("./modules/utils/mouse-detector.js"),
+        once = require("./modules/utils/once.js"),
+        oneAtATimePlease = require("./modules/utils/one-at-a-time-please.js"),
         HexEvent = require("./modules/logic/events.js"),
         ActivityMonitor = require("./modules/logic/activity-monitor.js"),
         GraphObjectsTool = require("./modules/logic/graph-objects-tool.js"),
@@ -35,22 +39,6 @@
         container.insertBefore(canvas, container.children[0]);
 
         return canvas;
-    }
-
-    function oneAtATimePlease(fn) {
-        var running = false,
-            wrapper = function oneAtATimePleaseWrapper() {
-                if (running) {
-                    return;
-                }
-                running = true;
-
-                fn.call(null);
-
-                running = false;
-            }
-
-        return wrapper;
     }
 
     function calculateHexagonSideLength() {
@@ -128,77 +116,8 @@
         setupActivityMonitor();
     }
 
-    function once(fn) {
-        var hasRun = false,
-            runOnceCheck = function() {
-                if (!hasRun) {
-                    hasRun = true;
-                    fn.call(null);
-                }
-            };
-
-        return runOnceCheck;
-    }
-
-    function onMouseDetector(fn) {
-        // Experimental code to detect if a mouse pointing device is used.
-        // If a mouse is detected, call the supplied function once.
-        var onTouchMoveEventArgs = {
-                target: null,
-            },
-            onTouchMove = function(e) {
-                onTouchMoveEventArgs.target = e.target;
-            },
-            onMouseMove = function(e) {
-                // If the target isn't the same, the assumption is that the touchmove event wasn't fired first - hence it's not a touch event.
-                // TODO: would be better to use the mouse event .x and .y, if matching ones exist in touchmove etcetera.
-                if (onTouchMoveEventArgs.target !== e.target) {
-                    onDetect();
-                }
-
-                // Release pointer
-                onTouchMoveEventArgs.target = null;
-            },
-            onDetect = once(function() {
-                document.removeEventListener("touchmove", onTouchMove);
-                document.removeEventListener("mousemove", onMouseMove);
-                fn.call(null);
-            });
-
-        document.addEventListener("touchmove", onTouchMove);
-        document.addEventListener("mousemove", onMouseMove);
-    }
-
-    function onResizeDetector(fn) {
-        // Currently not checking for height changes because that would
-        // reset the canvas every time the developer console was toggled.
-
-        // Chrome on Android also triggers a resize when scrolling enough to
-        // hide the address bar and menu.
-
-        // TODO: read this value once after canvas has been drawn, otherwise the first
-        // resize, even if in height, will trigger the drawing.
-        var previousCanvasWidth = 0;
-
-        window.addEventListener("resize", function onResizeEventListener() {
-            var canvas = getCanvas();
-
-            if (!canvas) {
-                fn.call(null);
-                return;
-            }
-
-            if (previousCanvasWidth !== canvas.scrollWidth) {
-                previousCanvasWidth = canvas.scrollWidth;
-
-                fn.call(null);
-                return;
-            }
-        });
-    }
-
     var run = oneAtATimePlease(generateAndRender);
 
-    onMouseDetector(once(run));
-    onResizeDetector(run);
+    mouseDetector(once(run));
+    resizeDetector(getCanvas(), run);
 }());
