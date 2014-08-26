@@ -32,8 +32,8 @@ function renderer(canvasId, canvasArea, graphObjects) {
     function getDefaultFillColor() {
         // TODO: move to options object
         // return "rgba(0, 0, 0, 0.01)";
-        return "rgba(127, 0, 0, 0.1)";
-        // return "transparent";
+        // return "rgba(127, 0, 0, 0.1)";
+        return "transparent";
     }
 
     function getColorByLocation(x, y, highlight) {
