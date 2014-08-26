@@ -69,7 +69,7 @@ function renderer(canvasId, canvasArea, graphObjects) {
     }
 
     function onGonifClick(event) {
-        lineHighlight.call(this);
+        highlightHexagon(this.tag.hexagon);
     }
 
     function lineReset() {
