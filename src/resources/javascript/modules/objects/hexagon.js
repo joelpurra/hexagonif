@@ -273,9 +273,15 @@ Hexagon.prototype.getLineThroughMiddle = function() {
     return line || null;
 }
 
-Hexagon.prototype.getCacheKey = function() {
+Hexagon.prototype.getCenter = function() {
     var lineThroughMiddle = this.getLineThroughMiddle(),
-        center = lineThroughMiddle && lineThroughMiddle.center(),
+        center = lineThroughMiddle && lineThroughMiddle.center();
+
+    return center || null;
+};
+
+Hexagon.prototype.getCacheKey = function() {
+    var center = this.getCenter(),
         centerCacheKey = center && center.cacheKey;
 
     return centerCacheKey || null;

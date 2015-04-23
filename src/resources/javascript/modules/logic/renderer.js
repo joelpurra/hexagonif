@@ -1,4 +1,4 @@
-function renderer(canvasId, canvasArea, lines) {
+function renderer(canvasId, canvasArea, graphObjects) {
     var random = require("../utils/random.js"),
         Hexagon = require("../objects/hexagon.js"),
         HexEvent = require("./events.js");
@@ -29,6 +29,13 @@ function renderer(canvasId, canvasArea, lines) {
         return "transparent";
     }
 
+    function getDefaultFillColor() {
+        // TODO: move to options object
+        // return "rgba(0, 0, 0, 0.01)";
+        // return "rgba(127, 0, 0, 0.1)";
+        return "transparent";
+    }
+
     function getColorByLocation(x, y, highlight) {
         // NOTE: x and y are not guaranteed to be inside the canvas area
         var byX = Math.floor((x / canvasArea.x) * 20),
@@ -46,12 +53,23 @@ function renderer(canvasId, canvasArea, lines) {
         strokeColor: getDefaultStrokeColor(),
     });
 
+    var gonifPrototype = canvas.display.polygon({
+        sides: 6,
+        fill: getDefaultFillColor(),
+        strokeWidth: getDefaultStrokeWidth(),
+        strokeColor: getDefaultStrokeColor(),
+    });
+
     function onLineMouseEnter(event) {
         lineHighlight.call(this);
     }
 
     function onLineMouseLeave(event) {
         lineUnhighlight.call(this);
+    }
+
+    function onGonifClick(event) {
+        highlightHexagon(this.tag.hexagon);
     }
 
     function lineReset() {
@@ -89,7 +107,7 @@ function renderer(canvasId, canvasArea, lines) {
         this.redraw();
     }
 
-    function draw(scene, start, end, tag) {
+    function drawLineInScene(scene, start, end, tag) {
         var line = linePrototype.clone({
             start: {
                 x: start.x,
@@ -111,21 +129,54 @@ function renderer(canvasId, canvasArea, lines) {
         return line;
     }
 
+    function drawGonifInScene(scene, center, radius, tag) {
+        var gonif = gonifPrototype.clone({
+            origin: {
+                x: center.x,
+                y: center.y
+            },
+            radius: radius,
+            tag: tag
+        });
+
+        scene.add(gonif);
+
+        gonif
+            .bind("click", onGonifClick);
+
+        return gonif;
+    }
+
     var sceneGrid = "grid";
 
     canvas.scenes.create(sceneGrid, function canvasScenesCreate() {
         var scene = this;
 
         // Object.keys(nodes).sort().reduce(function(start, end) {
-        //     draw(scene, nodes[start], nodes[end], node);
+        //     drawLineInScene(scene, nodes[start], nodes[end], node);
 
         //     return end;
         // });
 
-        Object.keys(lines).forEach(function linesForEachCreateGraphic(cacheKey) {
-            var line = lines[cacheKey];
+        // TODO: Async/queued object adding, so main user thread won't freeze/become unresponsive?
+        Object.keys(graphObjects.gonifs).forEach(function gonifsForEachCreateGraphic(cacheKey) {
+            var gonif = graphObjects.gonifs[cacheKey],
+                center = gonif.hexagon.getCenter(),
+                origin = {
+                    x: 0 - center.x,
+                    y: 0 - center.y,
+                },
+                // TODO DEBUG FIX
+                radius = (100 - 2),
+                graphic = drawGonifInScene(scene, origin, radius, gonif);
 
-            var graphic = draw(scene, line.start, line.end, line);
+            graphicsLookupCache[cacheKey] = graphic;
+        });
+
+        // TODO: Async/queued object adding, so main user thread won't freeze/become unresponsive?
+        Object.keys(graphObjects.lines).forEach(function linesForEachCreateGraphic(cacheKey) {
+            var line = graphObjects.lines[cacheKey],
+                graphic = drawLineInScene(scene, line.start, line.end, line);
 
             graphicsLookupCache[cacheKey] = graphic;
         });
