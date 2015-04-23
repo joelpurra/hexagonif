@@ -1,5 +1,7 @@
 # [hexagonif](https://github.com/joelpurra/hexagonif)
 
+Played around with the canvas for use in the background of a website, and ended up with this. In use at [joelpurra.com/projects/hexagonif](http://joelpurra.com/projects/hexagonif/) as a demo.
+
 - https://en.wiktionary.org/wiki/hexagon
 - https://en.wiktionary.org/wiki/gonif
 
