@@ -123,8 +123,8 @@ function renderer(canvasId, canvasArea, graphObjects) {
         scene.add(line);
 
         line
-            .bind("mouseenter", onLineMouseEnter)
-            .bind("mouseleave", onLineMouseLeave);
+            .bind("mouseenter touchenter", onLineMouseEnter)
+            .bind("mouseleave touchleave", onLineMouseLeave);
 
         return line;
     }
@@ -142,7 +142,7 @@ function renderer(canvasId, canvasArea, graphObjects) {
         scene.add(gonif);
 
         gonif
-            .bind("click", onGonifClick);
+            .bind("click tap", onGonifClick);
 
         return gonif;
     }
