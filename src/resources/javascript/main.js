@@ -11,6 +11,7 @@
         mouseDetector = require("./modules/utils/mouse-detector.js"),
         once = require("./modules/utils/once.js"),
         oneAtATimePlease = require("./modules/utils/one-at-a-time-please.js"),
+        delay = require("./modules/utils/delay.js"),
         HexEvent = require("./modules/logic/events.js"),
         ActivityMonitor = require("./modules/logic/activity-monitor.js"),
         GraphObjectsTool = require("./modules/logic/graph-objects-tool.js"),
@@ -130,5 +131,5 @@
     var run = oneAtATimePlease(generateAndRender);
 
     mouseDetector(once(run));
-    resizeDetector(getCanvas(), run);
+    resizeDetector(getCanvas(), window.Cowboy.debounce(1000, delay(run, 100)));
 }());
