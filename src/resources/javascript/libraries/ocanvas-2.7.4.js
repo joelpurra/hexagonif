@@ -1,8 +1,8 @@
 /*!
- * oCanvas v2.6.0
+ * oCanvas v2.7.4
  * http://ocanvas.org/
  *
- * Copyright 2011-2014, Johannes Koggdal
+ * Copyright 2011-2015, Johannes Koggdal
  * Licensed under the MIT license
  * http://ocanvas.org/license
  *
@@ -14,6 +14,9 @@
 
 	// Define the oCanvas object
 	var oCanvas = {
+	    
+		// Version number of this oCanvas release.
+		version: "2.7.4",
 		
 		// Array containing all canvases created by oCanvas on the current page
 		canvasList: [],
@@ -2581,7 +2584,7 @@
 						// Set the stroke object with correct values
 						stroke = {
 							pos: stroke[0],
-							width: parseInt(stroke[1]),
+							width: parseFloat(stroke[1]),
 							color: stroke[2]
 						};
 					}
@@ -2593,7 +2596,7 @@
 					// Set the stroke object
 					stroke = {
 						pos: "center",
-						width: parseInt(stroke[0]),
+						width: parseFloat(stroke[0]),
 						color: stroke[1]
 					};
 				}
@@ -3262,7 +3265,7 @@
 
 	// Define the class
 	var animation = function () {
-		
+
 		// Return an object when instantiated
 		var module = {
 
@@ -3878,7 +3881,7 @@
 
 				"ease-in-out-bounce": function (t, b, c, d) {
 					if (t < d/2) return this["ease-in-bounce"](t*2, 0, c, d) * .5 + b;
-					return this["ease-in-out-bounce"](t*2-d, 0, c, d) * .5 + c*.5 + b;
+					return this["ease-out-bounce"](t*2-d, 0, c, d) * .5 + c*.5 + b;
 				},
 
 				// Deprecated, will be replaced by the new syntax for calling easing functions
@@ -4966,6 +4969,10 @@
 		// Return an object when instantiated
 		return oCanvas.extend({
 			core: thecore,
+
+			_: oCanvas.extend({}, thecore.displayObject._, {
+				hasBeenDrawn: false
+			}),
 			
 			shapeType: "rectangular",
 			loaded: false,
@@ -4985,15 +4992,8 @@
 				if (this.image === undefined) {
 					return;
 				}
-				
-				// Get source (settings.image can be either an HTML img element or a string with path to the image)
-				source = (this.image.nodeName && this.image.nodeName.toLowerCase() === "img") ? "htmlImg" : "newImg";
-				
-				// Get image object (either create a copy of the current element, or a new image)
-				this.img = (source === "htmlImg") ? this.image.cloneNode(false) : new Image();
-				
-				// Temporarily append it to the canvas to be able to get dimensions
-				this.core.canvasElement.appendChild(this.img);
+
+				this.img = new Image();
 				
 				// Get dimensions when the image is loaded. Also, remove the temp img from DOM
 				this.img.onload = function () {
@@ -5016,14 +5016,10 @@
 					}
 					_this.tile_width = (_this.tile_width === 0) ? _this.width : _this.tile_width;
 					_this.tile_height = (_this.tile_height === 0) ? _this.height : _this.tile_height;
-					_this.core.canvasElement.removeChild(this);
-					_this.core.redraw();
+					if (_this._.hasBeenDrawn) _this.core.redraw();
 				};
-				
-				// Set the path to the image if a string was passed in
-				if (source === "newImg") {
-					this.img.src = this.image;
-				}
+
+				this.img.src = this.image.src || this.image || '';
 			},
 			
 			// Method that draws the image to the canvas once it's loaded
@@ -5098,6 +5094,8 @@
 						_this.draw();
 					}, 100);
 				}
+
+				this._.hasBeenDrawn = true;
 				
 				return this;
 			}
@@ -5111,6 +5109,8 @@
 
 
 
+
+	var loadedFonts = [];
 
 	// Define the class
 	var text = function (settings, thecore) {
@@ -5138,6 +5138,7 @@
 			align: "start",
 			baseline: "top",
 			_: oCanvas.extend({}, thecore.displayObject._, {
+				hasBeenDrawn: false,
 				font: "normal normal normal 16px/1 sans-serif",
 				style: "normal",
 				variant: "normal",
@@ -5295,12 +5296,18 @@
 			// Method for initializing a web font.
 			// Sometimes the font needs to be used once first to trigger it, before using it for the real text
 			initWebFont: function () {
+				var font = this.style + " " + this.variant + " " + this.weight + " 0px " + this.family;
+
+				if (loadedFonts.indexOf(font) > -1) return;
+				loadedFonts.push(font);
+
+				var self = this;
 				var core = this.core,
 					dummy;
 				
 				// Create a dummy element and set the current font
 				dummy = document.createElement("span");
-				dummy.style.font = this.style + " " + this.variant + " " + this.weight + " 0px " + this.family;
+				dummy.style.font = font;
 
 				// Append it to the DOM. This will trigger the web font to be used and available to the canvas
 				document.body.appendChild(dummy);
@@ -5309,7 +5316,7 @@
 				// Also redraw the canvas so text that didn't show before now appears
 				setTimeout(function () {
 					document.body.removeChild(dummy);
-					core.redraw();
+					if (self._.hasBeenDrawn) core.redraw();
 				}, 1000);
 			},
 
@@ -5382,6 +5389,8 @@
 				}
 				
 				canvas.closePath();
+
+				this._.hasBeenDrawn = true;
 				
 				return this;
 			}
