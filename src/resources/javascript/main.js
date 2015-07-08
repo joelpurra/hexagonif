@@ -15,7 +15,8 @@
         HexEvent = require("./modules/logic/events.js"),
         ActivityMonitor = require("./modules/logic/activity-monitor.js"),
         GraphObjectsTool = require("./modules/logic/graph-objects-tool.js"),
-        HighlightOnInterval = require("./modules/logic/highlight-on-interval.js");
+        HighlightOnInterval = require("./modules/logic/highlight-on-interval.js"),
+        debounce = (window.Cowboy || $).debounce;
 
     var canvasId = "hexagonif",
         canvasContainerId = "hexagonif-container";
@@ -131,5 +132,5 @@
     var run = oneAtATimePlease(generateAndRender);
 
     mouseDetector(once(run));
-    resizeDetector(getCanvas(), window.Cowboy.debounce(1000, delay(run, 100)));
+    resizeDetector(getCanvas(), debounce(1000, delay(run, 100)));
 }());
