@@ -5,7 +5,7 @@
     "description": "Hexagon gonif",
     "author": "Joel Purra",
     "license": "AGPL3",
-    "homepage": "http://joelpurra.com/",
+    "homepage": "https://joelpurra.com/",
     "dependencies": {},
     "devDependencies": {
         "connect-livereload": "^0.4.0",
