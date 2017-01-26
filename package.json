@@ -13,6 +13,11 @@
   "main": "gulpfile.js",
   "scripts": {
     "start": "gulp",
+    "clean": "gulp clean",
+    "build": "gulp build",
+    "server": "gulp server",
+    "watch": "gulp watch",
+    "open": "gulp open",
     "test": "npm run --silent lint",
     "lint": "npm run --silent eslint --",
     "eslint": "eslint ./src ./examples"
@@ -20,13 +25,13 @@
   "dependencies": {},
   "devDependencies": {
     "connect-livereload": "^0.4.0",
+    "eslint": "^3.12.2",
     "eslint-config-standard": "^6.2.1",
     "eslint-plugin-promise": "^3.4.0",
     "eslint-plugin-standard": "^2.0.1",
-    "eslint": "^3.12.2",
     "express": "^4.1.2",
+    "gulp": "^3.6.2",
     "gulp-browserify": "^0.5.0",
-    "gulp-clean": "~0.2.4",
     "gulp-livereload": "^1.5.0",
     "gulp-open": "~0.2.8",
     "gulp-rename": "^1.1.0",
@@ -35,9 +40,9 @@
     "gulp-strip-json-comments": "~0.1.1",
     "gulp-styl": "~0.2.0",
     "gulp-uglify": "~0.2.1",
-    "gulp": "^3.6.2",
     "pre-commit": "^1.2.2",
     "q": "^1.0.0",
+    "rimraf": "^2.5.4",
     "tiny-lr": "^0.0.7"
   },
   "directories": {
