@@ -1,4 +1,6 @@
 function renderer(canvasId, canvasArea, graphObjects) {
+    /* global oCanvas:false */
+
     var random = require("../utils/random.js"),
         Hexagon = require("../objects/hexagon.js"),
         HexEvent = require("./events.js");
@@ -9,9 +11,8 @@ function renderer(canvasId, canvasArea, graphObjects) {
     canvasElement.width = canvasArea.x;
     canvasElement.height = canvasArea.y;
 
-    var hexEvent = new HexEvent(canvasElement);
-
-    var canvas = oCanvas.create({
+    var hexEvent = new HexEvent(canvasElement),
+        canvas = oCanvas.create({
             canvas: "#" + canvasId,
         }),
         graphicsLookupCache = {};
@@ -48,17 +49,16 @@ function renderer(canvasId, canvasArea, graphObjects) {
     }
 
     var linePrototype = canvas.display.line({
-        cap: "round",
-        strokeWidth: getDefaultStrokeWidth(),
-        strokeColor: getDefaultStrokeColor(),
-    });
-
-    var gonifPrototype = canvas.display.polygon({
-        sides: 6,
-        fill: getDefaultFillColor(),
-        strokeWidth: getDefaultStrokeWidth(),
-        strokeColor: getDefaultStrokeColor(),
-    });
+            cap: "round",
+            strokeWidth: getDefaultStrokeWidth(),
+            strokeColor: getDefaultStrokeColor(),
+        }),
+        gonifPrototype = canvas.display.polygon({
+            sides: 6,
+            fill: getDefaultFillColor(),
+            strokeWidth: getDefaultStrokeWidth(),
+            strokeColor: getDefaultStrokeColor(),
+        });
 
     function onLineMouseEnter(event) {
         lineHighlight.call(this);
@@ -150,10 +150,10 @@ function renderer(canvasId, canvasArea, graphObjects) {
     var sceneGrid = "grid";
 
     canvas.scenes.create(sceneGrid, function canvasScenesCreate() {
-        var scene = this;
+        var self = this;
 
         // Object.keys(nodes).sort().reduce(function(start, end) {
-        //     drawLineInScene(scene, nodes[start], nodes[end], node);
+        //     drawLineInScene(self, nodes[start], nodes[end], node);
 
         //     return end;
         // });
@@ -168,7 +168,7 @@ function renderer(canvasId, canvasArea, graphObjects) {
                 },
                 // TODO DEBUG FIX
                 radius = (100 - 2),
-                graphic = drawGonifInScene(scene, origin, radius, gonif);
+                graphic = drawGonifInScene(self, origin, radius, gonif);
 
             graphicsLookupCache[cacheKey] = graphic;
         });
@@ -176,7 +176,7 @@ function renderer(canvasId, canvasArea, graphObjects) {
         // TODO: Async/queued object adding, so main user thread won't freeze/become unresponsive?
         Object.keys(graphObjects.lines).forEach(function linesForEachCreateGraphic(cacheKey) {
             var line = graphObjects.lines[cacheKey],
-                graphic = drawLineInScene(scene, line.start, line.end, line);
+                graphic = drawLineInScene(self, line.start, line.end, line);
 
             graphicsLookupCache[cacheKey] = graphic;
         });

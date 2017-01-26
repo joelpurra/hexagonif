@@ -2,11 +2,13 @@
     "use strict";
 
     var Point = require("./modules/objects/point.js"),
-        Line = require("./modules/objects/line.js"),
+        // NOTE: debug.
+        // Line = require("./modules/objects/line.js"),
         grapher = require("./modules/logic/grapher.js"),
         renderer = require("./modules/logic/renderer.js"),
         profiling = require("./modules/utils/profiling.js"),
-        random = require("./modules/utils/random.js"),
+        // NOTE: debug.
+        // random = require("./modules/utils/random.js"),
         resizeDetector = require("./modules/utils/resize-detector.js"),
         mouseDetector = require("./modules/utils/mouse-detector.js"),
         once = require("./modules/utils/once.js"),
@@ -16,10 +18,12 @@
         ActivityMonitor = require("./modules/logic/activity-monitor.js"),
         GraphObjectsTool = require("./modules/logic/graph-objects-tool.js"),
         HighlightOnInterval = require("./modules/logic/highlight-on-interval.js"),
-        debounce = (window.Cowboy || $).debounce;
+        debounce = (window.Cowboy || window.jQuery).debounce,
 
-    var canvasId = "hexagonif",
-        canvasContainerId = "hexagonif-container";
+        canvasId = "hexagonif",
+        canvasContainerId = "hexagonif-container",
+
+        run = oneAtATimePlease(generateAndRender);
 
     function getCanvas() {
         var canvas = document.getElementById(canvasId);
@@ -47,14 +51,14 @@
         // TODO DEBUG REMOVE
         return 100;
 
-        var canvas = getCanvas(),
-            absoluteMin = 75,
-            absoluteMax = 150,
-            shortestCanvasSide = Math.min(canvas.scrollWidth, canvas.scrollHeight),
-            min = Math.max(absoluteMin, shortestCanvasSide / 20),
-            max = Math.min(absoluteMax, shortestCanvasSide / 10);
-
-        return random.integer(min, max);
+        // var canvas = getCanvas(),
+        //     absoluteMin = 75,
+        //     absoluteMax = 150,
+        //     shortestCanvasSide = Math.min(canvas.scrollWidth, canvas.scrollHeight),
+        //     min = Math.max(absoluteMin, shortestCanvasSide / 20),
+        //     max = Math.min(absoluteMax, shortestCanvasSide / 10);
+        //
+        // return random.integer(min, max);
     }
 
     function generateAndRender() {
@@ -71,48 +75,51 @@
             }),
             hexEvent = new HexEvent(canvas),
             activityMonitor = new ActivityMonitor(hexEvent),
-            addGonifNeighborDebugLines = function() {
-                Object.keys(graphObjects.gonifs).forEach(function(gonifKey) {
-                    var gonif = graphObjects.gonifs[gonifKey],
-                        fromCenter = gonif.hexagon.getCenter();
-
-                    if (!fromCenter) {
-                        return;
-                    }
-
-                    gonif.getNeighbors().forEach(function(neighbor) {
-                        if (neighbor) {
-                            var toLine = neighbor.hexagon.getLineThroughMiddle(),
-                                toCenter = toLine && toLine.center();
-
-                            if (!toCenter) {
-                                return;
-                            }
-
-                            var line = new Line(fromCenter, toCenter);
-
-                            graphObjects.lines[line.cacheKey] = line;
-                        }
-                    });
-                });
-            },
+            // NOTE: debug.
+            // addGonifNeighborDebugLines = function() {
+            //     Object.keys(graphObjects.gonifs).forEach(function(gonifKey) {
+            //         var gonif = graphObjects.gonifs[gonifKey],
+            //             fromCenter = gonif.hexagon.getCenter();
+            //
+            //         if (!fromCenter) {
+            //             return;
+            //         }
+            //
+            //         gonif.getNeighbors().forEach(function(neighbor) {
+            //             if (neighbor) {
+            //                 var toLine = neighbor.hexagon.getLineThroughMiddle(),
+            //                     toCenter = toLine && toLine.center();
+            //
+            //                 if (!toCenter) {
+            //                     return;
+            //                 }
+            //
+            //                 var line = new Line(fromCenter, toCenter);
+            //
+            //                 graphObjects.lines[line.cacheKey] = line;
+            //             }
+            //         });
+            //     });
+            // },
             setupActivityMonitor = function() {
                 function startActivities() {
-                    highlightOnInterval.isStarted() || highlightOnInterval.start();
+                    if (!highlightOnInterval.isStarted())
+                    {
+                        highlightOnInterval.start();
+                    }
                 }
 
                 function stopActivities() {
-                    highlightOnInterval.isStarted() && highlightOnInterval.stop();
+                    if (highlightOnInterval.isStarted())
+                    {
+                        highlightOnInterval.stop();
+                    }
                 }
 
                 hexEvent.listen("user.activity", function() {
-                    // TODO DEBUG REMOVE
-                    console.log("User activity!");
                     startActivities();
                 });
                 hexEvent.listen("user.inactivity", function() {
-                    // TODO DEBUG REMOVE
-                    console.log("User inactivity!");
                     stopActivities();
                 });
 
@@ -122,14 +129,13 @@
             scene,
             highlightOnInterval;
 
+        // NOTE: debug.
         // addGonifNeighborDebugLines();
 
         scene = profiledRenderer();
         highlightOnInterval = new HighlightOnInterval(scene, graphObjectsTool, hexEvent);
         setupActivityMonitor();
     }
-
-    var run = oneAtATimePlease(generateAndRender);
 
     mouseDetector(once(run));
     resizeDetector(getCanvas(), debounce(1000, delay(run, 100)));

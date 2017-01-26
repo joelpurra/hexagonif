@@ -1,5 +1,6 @@
-var HexEvent = require("./events.js"),
-    activityEventName = "user.activity",
+// TODO: use HexEvent?
+// var HexEvent = require("./events.js");
+var activityEventName = "user.activity",
     inactivityEventName = "user.inactivity";
 
 function ActivityMonitor(hexEvent, limit) {

@@ -2,13 +2,29 @@ function wrap(name, fn) {
     var wrapped = function() {
         var result;
 
-        console && console.timeline && console.timeline(name);
-        console && console.profile && console.profile(name);
+        /* eslint-disable no-console */
+        if (console && console.timeline)
+        {
+            console.timeline(name);
+        }
+
+        if (console && console.profile)
+        {
+            console.profile(name);
+        }
 
         result = fn.call(null);
 
-        console && console.timelineEnd && console.timelineEnd();
-        console && console.profileEnd && console.profileEnd();
+        if (console && console.timelineEnd)
+        {
+            console.timelineEnd();
+        }
+
+        if (console && console.profileEnd)
+        {
+            console.profileEnd();
+        }
+        /* eslint-enable no-console */
 
         return result;
     };

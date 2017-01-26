@@ -1,5 +1,3 @@
-function noop() {}
-
 function asyncExecute(fn) {
     setTimeout(function() {
         fn.call(null);
@@ -45,7 +43,9 @@ AsyncQueue.prototype.consume = function() {
             var done = this.done;
             this.done = null;
 
-            done && asyncExecute(done);
+            if (done) {
+                asyncExecute(done);
+            }
         }
     }
 };

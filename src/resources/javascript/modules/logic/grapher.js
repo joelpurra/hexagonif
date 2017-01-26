@@ -3,8 +3,7 @@ var Point = require("../objects/point.js"),
     Hexagon = require("../objects/hexagon.js"),
     Gonif = require("../objects/gonif.js"),
     Area = require("../objects/area.js"),
-    limitPrecision = require("../utils/limit-precision.js"),
-    random = require("../utils/random.js");
+    limitPrecision = require("../utils/limit-precision.js");
 
 function getOrGenerateHexagon(cache, hexagonSideLength, startPoint, startCorner) {
     var hexagon = new Hexagon();
@@ -14,43 +13,40 @@ function getOrGenerateHexagon(cache, hexagonSideLength, startPoint, startCorner)
 
     do {
         // Points and corners
-        {
-            var pointCacheKey = point.cacheKey,
-                cachedPoint = cache.nodes[pointCacheKey];
+        var pointCacheKey = point.cacheKey,
+            cachedPoint = cache.nodes[pointCacheKey];
 
-            if (cachedPoint === undefined) {
-                cache.nodes[pointCacheKey] = point;
-            } else {
-                point = cachedPoint;
-            }
-
-            hexagon.setCornerPoint(corner, point);
-
-            var nextCorner = Hexagon.Corners.next(corner);
-            var x = limitPrecision(point.x - (hexagonSideLength * Math.cos(corner.rad)), 5),
-                y = limitPrecision(point.y + (hexagonSideLength * Math.sin(corner.rad)), 5);
-            var nextPoint = new Point(x, y);
+        if (cachedPoint === undefined) {
+            cache.nodes[pointCacheKey] = point;
+        } else {
+            point = cachedPoint;
         }
+
+        hexagon.setCornerPoint(corner, point);
+
+        var nextCorner = Hexagon.Corners.next(corner);
+        var x = limitPrecision(point.x - (hexagonSideLength * Math.cos(corner.rad)), 5),
+            y = limitPrecision(point.y + (hexagonSideLength * Math.sin(corner.rad)), 5);
+        var nextPoint = new Point(x, y);
 
         // Lines and sides
-        {
-            var line = new Line(point, nextPoint);
+        var line = new Line(point, nextPoint);
 
-            var lineCacheKey = line.cacheKey,
-                cachedLine = cache.lines[lineCacheKey];
+        var lineCacheKey = line.cacheKey,
+            cachedLine = cache.lines[lineCacheKey];
 
-            if (cachedLine === undefined) {
-                cache.lines[lineCacheKey] = line;
-            } else {
+        if (cachedLine === undefined) {
+            cache.lines[lineCacheKey] = line;
+        } else {
                 //throw new Error("Line already exists " + line.cacheKey)
-                line = cachedLine;
-            }
-
-            var side = Hexagon.Sides.fromCorner(corner);
-
-            hexagon.setSideLine(side, line);
+            line = cachedLine;
         }
 
+        var side = Hexagon.Sides.fromCorner(corner);
+
+        hexagon.setSideLine(side, line);
+
+        // Pass to next iteration.
         point = nextPoint;
         corner = nextCorner;
 
@@ -96,27 +92,33 @@ function getOrGenerateGonif(cache, hexagonSideLength, startPoint, startSide) {
     return gonif;
 }
 
-function addNeighbors(gonif) {
-    var sidesToCheck = Hexagon.Sides.all();
+function eachSharedNeighborDirection(gonif, neighbor, sidesToCheck, sharedNeighborDirection) {
+    var sharedNeighbor = neighbor.getNeighbor(sharedNeighborDirection.fromNeighbor);
 
-    while (side = sidesToCheck.shift()) {
+    if ((!!sharedNeighbor) && gonif.getNeighbor(sharedNeighborDirection.fromHere) !== sharedNeighbor) {
+        gonif.setNeighbor(sharedNeighborDirection.fromHere, sharedNeighbor);
+        sharedNeighbor.setNeighbor(Hexagon.Sides.opposite(sharedNeighborDirection.fromHere), gonif);
+
+        // In case this one has neighbors still unknown, but already checked in the inital pass.
+        sidesToCheck.push(sharedNeighborDirection.fromHere);
+    }
+}
+
+function addNeighbors(gonif) {
+    var sidesToCheck = Hexagon.Sides.all(),
+        side = sidesToCheck.shift();
+
+    while (side) {
         var neighbor = gonif.getNeighbor(side);
 
         if (neighbor) {
-            var sharedNeighborDirections = Gonif.Neighbors.getSharedNeighborDirections(side);
+            var boundEachSharedNeighborDirection = eachSharedNeighborDirection.bind(null, gonif, neighbor, sidesToCheck),
+                sharedNeighborDirections = Gonif.Neighbors.getSharedNeighborDirections(side);
 
-            sharedNeighborDirections.forEach(function(sharedNeighborDirection) {
-                var sharedNeighbor = neighbor.getNeighbor(sharedNeighborDirection.fromNeighbor);
-
-                if ((!!sharedNeighbor) && gonif.getNeighbor(sharedNeighborDirection.fromHere) !== sharedNeighbor) {
-                    gonif.setNeighbor(sharedNeighborDirection.fromHere, sharedNeighbor);
-                    sharedNeighbor.setNeighbor(Hexagon.Sides.opposite(sharedNeighborDirection.fromHere), gonif);
-
-                    // In case this one has neighbors still unknown, but already checked in the inital pass.
-                    sidesToCheck.push(sharedNeighborDirection.fromHere);
-                }
-            });
+            sharedNeighborDirections.forEach(boundEachSharedNeighborDirection);
         }
+
+        side = sidesToCheck.shift();
     }
 }
 

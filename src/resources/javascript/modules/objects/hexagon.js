@@ -2,9 +2,9 @@ var Corner = require("./corner.js"),
     CornerPoint = require("./cornerpoint.js"),
     Side = require("./side.js"),
     Line = require("./line.js"),
-    SideLine = require("./sideline.js");
+    SideLine = require("./sideline.js"),
 
-var NUMBER_OF_SIDES = 6;
+    NUMBER_OF_SIDES = 6;
 
 function Hexagon() {
     this.points = {
@@ -255,20 +255,22 @@ Hexagon.Sides.fromCorner = function(start) {
 
 Hexagon.prototype.getLineThroughMiddle = function() {
     var line,
-        hexagon = this;
+        self = this;
 
-    this.cornerPoints().slice(0, 2).some(function findTwoOpposingCorners(cornerPoint) {
-        var oppositeCorner = (!!cornerPoint) && Hexagon.Corners.opposite(cornerPoint.corner),
-            oppositeCornerPoint = (!!oppositeCorner) && hexagon.getCornerPoint(oppositeCorner);
+    this.cornerPoints()
+        .slice(0, 2)
+        .some(function findTwoOpposingCorners(cornerPoint) {
+            var oppositeCorner = (!!cornerPoint) && Hexagon.Corners.opposite(cornerPoint.corner),
+                oppositeCornerPoint = (!!oppositeCorner) && self.getCornerPoint(oppositeCorner);
 
-        line = oppositeCornerPoint && new Line(cornerPoint.point, oppositeCornerPoint.point);
+            line = oppositeCornerPoint && new Line(cornerPoint.point, oppositeCornerPoint.point);
 
-        if (line) {
-            return true;
-        }
+            if (line) {
+                return true;
+            }
 
-        return false;
-    });
+            return false;
+        });
 
     return line || null;
 };

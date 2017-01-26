@@ -7,9 +7,9 @@ function HighlightOnInterval(scene, graphObjectsTool, hexEvent) {
     this.hexEvent = hexEvent;
 
     this.isHighlighterStarted = false;
-    this.highlightCounter = 0,
+    this.highlightCounter = 0;
     this.highlightCounterInterval = null;
-    this.isAutomatedHighlight = false,
+    this.isAutomatedHighlight = false;
     this.highlightInterval = null;
 
     this.highlightMilliseconds = 1000;
@@ -87,7 +87,7 @@ HighlightOnInterval.prototype.hexagonifLineUnhighlightEventListener = function()
 };
 
 HighlightOnInterval.prototype.isStarted = function() {
-    return this.isHighlighterStarted == true;
+    return this.isHighlighterStarted === true;
 };
 
 HighlightOnInterval.prototype.start = function() {
