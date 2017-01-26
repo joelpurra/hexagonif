@@ -1,27 +1,46 @@
 {
-    "name": "hexagonif",
-    "private": true,
-    "version": "0.0.0",
-    "description": "Hexagon gonif",
-    "author": "Joel Purra",
-    "license": "AGPL3",
-    "homepage": "https://joelpurra.com/",
-    "dependencies": {},
-    "devDependencies": {
-        "connect-livereload": "^0.4.0",
-        "express": "^4.1.2",
-        "gulp": "^3.6.2",
-        "gulp-browserify": "^0.5.0",
-        "gulp-clean": "~0.2.4",
-        "gulp-livereload": "^1.5.0",
-        "gulp-open": "~0.2.8",
-        "gulp-rename": "^1.1.0",
-        "gulp-size": "^0.3.1",
-        "gulp-strip-debug": "^0.3.0",
-        "gulp-strip-json-comments": "~0.1.1",
-        "gulp-styl": "~0.2.0",
-        "gulp-uglify": "~0.2.1",
-        "tiny-lr": "^0.0.7",
-        "q": "^1.0.0"
-    }
+  "name": "hexagonif",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Hexagon gonif",
+  "author": {
+    "name": "Joel Purra",
+    "email": "code@joelpurra.com",
+    "url": "https://joelpurra.com/"
+  },
+  "license": "AGPL-3.0",
+  "homepage": "https://joelpurra.com/",
+  "main": "gulpfile.js",
+  "scripts": {
+    "start": "gulp",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "connect-livereload": "^0.4.0",
+    "express": "^4.1.2",
+    "gulp": "^3.6.2",
+    "gulp-browserify": "^0.5.0",
+    "gulp-clean": "~0.2.4",
+    "gulp-livereload": "^1.5.0",
+    "gulp-open": "~0.2.8",
+    "gulp-rename": "^1.1.0",
+    "gulp-size": "^0.3.1",
+    "gulp-strip-debug": "^0.3.0",
+    "gulp-strip-json-comments": "~0.1.1",
+    "gulp-styl": "~0.2.0",
+    "gulp-uglify": "~0.2.1",
+    "tiny-lr": "^0.0.7",
+    "q": "^1.0.0"
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joelpurra/hexagonif.git"
+  },
+  "bugs": {
+    "url": "https://github.com/joelpurra/hexagonif/issues"
+  }
 }
