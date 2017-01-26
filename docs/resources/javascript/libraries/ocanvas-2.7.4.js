@@ -14,29 +14,29 @@
 
 	// Define the oCanvas object
 	var oCanvas = {
-
+	    
 		// Version number of this oCanvas release.
 		version: "2.7.4",
-
+		
 		// Array containing all canvases created by oCanvas on the current page
 		canvasList: [],
-
+		
 		// Object containing all the registered modules
 		modules: {},
-
+		
 		// Object containing all the registered init methods
 		inits: {},
-
+		
 		// Object containing all the registered plugins
 		plugins: {},
-
+		
 		// Define the core class
 		core: function (options) {
 			this.isCore = true;
-
+		
 			// Add the canvas to the canvas list on the global object
 			this.id = oCanvas.canvasList.push(this) - 1;
-
+			
 			// A number which is used to give new objects an ID
 			this.lastObjectID = 0;
 
@@ -45,7 +45,7 @@
 
 			// Initialize a list of all DOM event handlers
 			this.domEventHandlers = [];
-
+			
 			// Add the registered modules to the new instance of core
 			for (var m in oCanvas.modules) {
 				if (typeof oCanvas.modules[m] === "function") {
@@ -54,7 +54,7 @@
 					this[m] = Object.create(oCanvas.modules[m]);
 				}
 			}
-
+			
 			// Set up default settings
 			this.settings = {
 				fps: 30, // Deprecated value, will soon be changed to 60
@@ -70,22 +70,22 @@
 
 			// Save these settings in case the core instance is reset
 			this.originalSettings = oCanvas.extend({}, this.settings);
-
+			
 			// Set canvas to specified element
 			if (this.settings.canvas.nodeName && this.settings.canvas.nodeName.toLowerCase() === "canvas") {
 				this.canvasElement = this.settings.canvas;
 			}
-
+			
 			// Set canvas to the element specified using a selector
 			else if (typeof this.settings.canvas === "string") {
 				this.canvasElement = document.querySelector(this.settings.canvas);
 			}
-
+			
 			// Return false if no canvas was specified
 			else {
 				return false;
 			}
-
+			
 			// Get the canvas context and dimensions
 			this.canvas = this.canvasElement.getContext("2d");
 			var width = this.canvasElement.width;
@@ -116,10 +116,10 @@
 					return height;
 				}
 			});
-
+		
 			// Set the core instance in all modules to enable access of core properties inside of modules
 			for (var m in oCanvas.modules) {
-
+			
 				// Add core access to modules in a wrapper module (like display objects that reside in the wrapper display)
 				if (this[m].wrapper === true) {
 					for (var wm in this[m]) {
@@ -129,23 +129,23 @@
 						else if (typeof this[m][wm].setCore === "function") {
 							this[m][wm].setCore(this);
 						}
-
+						
 						this[m].core = this;
 					}
 				}
-
+				
 				// Add core access to modules that reside directly in the core
 				this[m].core = this;
 			}
-
+			
 			// Initialize added modules that have registered init methods
 			for (var name in oCanvas.inits) {
-
+			
 				// Modules directly on the oCanvas object
 				if ((typeof oCanvas.inits[name] === "string") && (typeof this[name][oCanvas.inits[name]] === "function")) {
 					this[name][oCanvas.inits[name]]();
 				}
-
+				
 				// Modules that are parts of a wrapper module
 				else if (oCanvas.inits[name] === "object") {
 					for (var subname in oCanvas.inits[name]) {
@@ -155,7 +155,7 @@
 					}
 				}
 			}
-
+			
 			// Run plugins if any have been specified
 			var plugins = this.settings.plugins;
 			if (plugins.length > 0) {
@@ -166,13 +166,13 @@
 				}
 			}
 		},
-
+		
 		// Method for registering a new module
 		registerModule: function (name, module, init) {
 			if (~name.indexOf(".")) {
 				var parts = name.split(".");
 				oCanvas.modules[parts[0]][parts[1]] = module;
-
+				
 				if (init !== undefined) {
 					if (!oCanvas.inits[parts[0]]) {
 						oCanvas.inits[parts[0]] = {};
@@ -186,7 +186,7 @@
 				}
 			}
 		},
-
+		
 		// Method for registering a new plugin
 		// The plugin will not be run until a new core instance is being created,
 		// and the instance requests the plugin, thus allowing a plugin to change
@@ -194,10 +194,10 @@
 		registerPlugin: function (name, plugin) {
 			oCanvas.plugins[name] = plugin;
 		},
-
+		
 		// Function for creating a new instance of oCanvas
 		create: function (settings) {
-
+		
 			// Create the new instance and return it
 			return new oCanvas.core(settings);
 		},
@@ -252,53 +252,53 @@
 		}
 
 	};
-
-
+	
+	
 	// Methods the core instances will have access to
 	oCanvas.core.prototype = {
-
+		
 		// Method for adding an object to the canvas
 		addChild: function (displayobj, redraw) {
 			displayobj.add(redraw);
-
+			
 			return this;
 		},
-
+		
 		// Method for removing an object from the canvas
 		removeChild: function (displayobj, redraw) {
 			displayobj.remove(redraw);
-
+			
 			return this;
 		},
-
+		
 		// Shorthand method for clearing the canvas
 		clear: function (keepBackground) {
 			this.draw.clear(keepBackground);
-
+			
 			return this;
 		},
-
+		
 		// Shorthand method for redrawing the canvas
 		redraw: function () {
 			this.draw.redraw();
-
+			
 			return this;
 		},
-
+		
 		// Method for binding an event to the canvas
 		bind: function (types, handler) {
 			this.events.bind(this.canvasElement, types.split(" "), handler);
-
+			
 			return this;
 		},
-
+		
 		// Method for unbinding an event from the object
 		unbind: function (types, handler) {
 			this.events.unbind(this.canvasElement, types.split(" "), handler);
-
+			
 			return this;
 		},
-
+			
 		// Method for triggering all events added to the object
 		trigger: function (types, eventObject) {
 			var events = this.events;
@@ -350,14 +350,14 @@
 	window.oCanvas = oCanvas;
 
 	oCanvas.domReady();
-
+	
 
 
 
 
 	// Extend an object with new properties and replace values for existing properties
 	oCanvas.extend = function () {
-
+	
 		// Get first two args
 		var args = Array.prototype.slice.call(arguments),
 			last = args[args.length - 1],
@@ -365,25 +365,25 @@
 			current = args.splice(0, 1)[0],
 			x, exclude = [],
 			descriptor;
-
+		
 		// If the last object is an exclude object, get the properties
 		if (last.exclude && (JSON.stringify(last) === JSON.stringify({exclude:last.exclude}))) {
 			exclude = last.exclude;
 		}
-
+		
 		// Do the loop unless this object is an exclude object
 		if (current !== last || exclude.length === 0) {
-
+			
 			// Add members from second object to the first
 			for (x in current) {
-
+			
 				// Exclude specified properties
 				if (~exclude.indexOf(x)) {
 					continue;
 				}
-
+				
 				descriptor = Object.getOwnPropertyDescriptor(current, x);
-
+				
 				if (descriptor.get || descriptor.set) {
 					Object.defineProperty(destination, x, descriptor);
 				} else {
@@ -391,7 +391,7 @@
 				}
 			}
 		}
-
+		
 		// If there are more objects passed in, run once more, otherwise return the first object
 		if (args.length > 0) {
 			return oCanvas.extend.apply(this, [destination].concat(args));
@@ -491,30 +491,30 @@
 
 	// Define the timeline class
 	var timeline = function () {
-
+	
 		// Return an object when instantiated
 		var module = {
-
+			
 			init: function () {
 				var _this = this;
-
+				
 				// Method for setting the function to be called for each frame
 				this.core.setLoop = function (callback) {
 					_this.userLoop = callback;
-
+					
 					// Return the timeline object to enable methods like start() to be called directly
 					return _this;
 				};
 			},
-
+			
 			// Set default values when initialized
 			currentFrame: 1,
 			timeline: 0,
 			running: false,
-
+			
 			set fps (value) {
 				this.core.settings.fps = value;
-
+				
 				// Restart the timer if the timeline is running
 				if (this.running) {
 					this.start();
@@ -523,7 +523,7 @@
 			get fps () {
 				return this.core.settings.fps;
 			},
-
+			
 			// Method that will be called for each frame
 			loop: function () {
 				if (!this.running) {
@@ -536,7 +536,7 @@
 					module.timeline = requestAnimationFrame(module.loopBound);
 
 					var core = module.core;
-
+				
 					// If mainLoop has been defined
 					if (typeof module.userLoop === "function") {
 
@@ -564,44 +564,44 @@
 			loopBound: function () {
 				module.loop();
 			},
-
+		
 			// Method that starts the timeline
 			start: function () {
 				cancelAnimationFrame(module.timeline);
 				module.running = true;
 				module.loop();
-
+				
 				return this;
 			},
-
+			
 			// Method that stops the timeline
 			stop: function () {
 				this.running = false;
 				cancelAnimationFrame(module.timeline);
-
+				
 				return this;
 			}
 		};
 
 		return module;
 	};
-
+	
 	// Register the timeline module
 	oCanvas.registerModule("timeline", timeline, "init");
-
+	
 
 
 
 	// Define the class
 	var keyboard = function () {
-
+		
 		// Return an object when instantiated
 		return {
-
+			
 			keysDown: {},
 			keyPressTimers: {},
 			modifiedKeys: [],
-
+			
 			// Method for initializing the keyboard object
 			init: function () {
 				var self = this;
@@ -631,7 +631,7 @@
 
 				// Prevent default for keys that have been added to the prevent list
 				this.preventDefault(e);
-
+			
 				// Cancel event if the key is already pressed down
 				// (some browsers repeat even keydown when held down)
 				if (e.type === "keydown" && this.keysDown[keyCode] === true) {
@@ -670,7 +670,7 @@
 					}
 				}
 			},
-
+			
 			// Method for preventing the default behavior of the assigned keys
 			preventDefault: function (e) {
 				if ((this.core.mouse && this.core.mouse.canvasFocused === true) || !this.core.mouse) {
@@ -681,25 +681,25 @@
 					}
 				}
 			},
-
+			
 			// Method for adding keys that will have the default actions prevented
 			addPreventDefaultFor: function (keys) {
-
+				
 				// Fix the keys array
 				keys = (typeof keys === "number") ? [keys] : ((keys instanceof Array) ? keys : []);
-
+				
 				// Add the keys
 				for (var i = 0; i < keys.length; i++) {
 					this.modifiedKeys.push(keys[i]);
 				}
 			},
-
+			
 			// Method for removing keys that will no longer have the default actions prevented
 			removePreventDefaultFor: function (keys) {
-
+				
 				// Fix the keys array
 				keys = (typeof keys === "number") ? [keys] : ((keys instanceof Array) ? keys : []);
-
+				
 				// Remove the keys
 				var i, index;
 				for (i = 0; i < keys.length; i++) {
@@ -709,7 +709,7 @@
 					}
 				}
 			},
-
+			
 			// Method for getting the key code from current event
 			getKeyCode: function (e) {
 				return e.keyCode === 0 ? e.which : e.keyCode;
@@ -751,11 +751,11 @@
 
 				return currentlyDown;
 			},
-
+			
 			ARROW_UP:38, ARROW_DOWN:40, ARROW_LEFT:37, ARROW_RIGHT:39, SPACE:32, ENTER:13, ESC:27
 		};
 	};
-
+	
 	// Register the module
 	oCanvas.registerModule("keyboard", keyboard, "init");
 
@@ -764,7 +764,7 @@
 
 	// Define the class
 	var mouse = function () {
-
+		
 		// Return an object when instantiated
 		return {
 
@@ -806,7 +806,7 @@
 
 			bindHandlers: function () {
 				var self, core, canvasElement, type;
-
+				
 				self = this;
 				core = this.core;
 				canvasElement = core.canvasElement;
@@ -907,7 +907,7 @@
 
 				}
 			},
-
+			
 			getPos: function (e) {
 				var canvas = this.core.canvasElement;
 				var boundingRect = canvas.getBoundingClientRect();
@@ -930,13 +930,13 @@
 				this.x = pos.x;
 				this.y = pos.y;
 			},
-
+			
 			onCanvas: function (e) {
 				e = e || (this.core.events.lastPointerEventObject && this.core.events.lastPointerEventObject.originalEvent);
-
+				
 				// Get pointer position
 				var pos = e ? this.getPos(e) : { x: this.x, y: this.y };
-
+				
 				// Check boundaries => (left) && (right) && (top) && (bottom)
 				if ( (pos.x >= 0) && (pos.x <= this.core.width) && (pos.y >= 0) && (pos.y <= this.core.height) ) {
 					this.canvasHovered = true;
@@ -982,7 +982,7 @@
 
 	// Define the class
 	var touch = function () {
-
+		
 		// Return an object when instantiated
 		return {
 
@@ -1018,7 +1018,7 @@
 
 				if (this.isTouch) {
 					core.pointer = this;
-
+					
 					// Set iOS specific settings to prevent selection of the canvas element
 					canvasElement.style.WebkitUserSelect = "none";
 					canvasElement.style.WebkitTouchCallout = "none";
@@ -1030,7 +1030,7 @@
 
 			bindHandlers: function () {
 				var self, core, canvasElement, type;
-
+				
 				self = this;
 				core = this.core;
 				canvasElement = core.canvasElement;
@@ -1162,12 +1162,12 @@
 
 				}
 			},
-
+			
 			getPos: function (e) {
 				var x, y;
 
 				var touches = e.changedTouches;
-
+				
 				if (touches !== undefined && touches.length > 0) {
 					e = touches[0];
 					var canvas = this.core.canvasElement;
@@ -1187,7 +1187,7 @@
 					x = this.x;
 					y = this.y;
 				}
-
+				
 				return { x: x, y: y };
 			},
 
@@ -1196,13 +1196,13 @@
 				this.x = pos.x;
 				this.y = pos.y;
 			},
-
+			
 			onCanvas: function (e) {
 				e = e || (this.core.events.lastPointerEventObject && this.core.events.lastPointerEventObject.originalEvent);
-
+				
 				// Get pointer position
 				var pos = e ? this.getPos(e) : { x: this.x, y: this.y };
-
+				
 				// Check boundaries => (left) && (right) && (top) && (bottom)
 				if ( (pos.x >= 0) && (pos.x <= this.core.width) && (pos.y >= 0) && (pos.y <= this.core.height) ) {
 					this.canvasHovered = true;
@@ -1230,15 +1230,15 @@
 
 	// Define the class
 	var tools = function () {
-
+		
 		// Return an object when instantiated
 		return {
-
+			
 			// Method for transforming the pointer position to the current object's transformation
 			transformPointerPosition: function (obj, cX, cY, extraAngle, pointer) {
 				extraAngle = extraAngle || 0;
 				pointer = pointer || this.core.pointer;
-
+				
 				// All calls that come from isPointerInside() will pass the display object as its first argument
 				// This method will then do multiple transforms for each object in the parent chain to get the correct result
 				if (typeof obj === "object") {
@@ -1246,47 +1246,47 @@
 						objectChain = [],
 						pos = { x: 0, y: 0 },
 						last, object, n, l, origin;
-
+					
 					// Get all objects in the parent chain, including this one
 					objectChain.push(obj);
 					while (parent && parent !== this.core) {
 						objectChain.push(parent);
 						parent = parent.parent;
 					}
-
+					
 					// Reverse the array so the top level parent comes first, and ends with the current object
 					objectChain.reverse();
-
+					
 					// Loop through all objects in the parent chain
 					last = pointer;
 					for (n = 0, l = objectChain.length; n < l; n++) {
 						object = objectChain[n];
-
+						
 						// If the object has a rotation, get the transformed mouse position for that rotation
 						pos = this.transformPointerPosition(object.rotation, object.abs_x, object.abs_y, 0, last);
-
+						
 						// Save the current position so that the next iteration can use that as the pointer
 						last = pos;
 					}
-
+					
 					// Rotate an extra angle if specified
 					if (extraAngle !== 0) {
 						origin = obj.getOrigin();
 						pos = this.transformPointerPosition(extraAngle * -1, cX - origin.x, cY - origin.y, 0, last);
 					}
-
+					
 					// Return the correct position after all transforms
 					return {
 						x: pos.x,
 						y: pos.y
 					};
 				}
-
+				
 				// If the first argument is not an object, it is the rotation passed in above
 				else {
 					var rotation = obj;
 				}
-
+				
 				var topright = (pointer.x >= cX && pointer.y <= cY),
 					bottomright = (pointer.x >= cX && pointer.y >= cY),
 					bottomleft = (pointer.x <= cX && pointer.y >= cY),
@@ -1295,37 +1295,37 @@
 					rotation = ((rotation / 360) - Math.floor(rotation / 360)) * 360 - extraAngle,
 					c, x, y,
 					b = (D === 0) ? 0 : Math.abs(pointer.y - cY) / D;
-
+				
 				// When pointer is in top right or bottom left corner
 				if ( topright || bottomleft ) {
 					c = (180 - rotation - Math.asin(b) * 180 / Math.PI) * Math.PI / 180;
-
+					
 					x = cX + Math.cos(c) * D * (topright ? -1 : 1);
 					y = cY + Math.sin(c) * D * (topright ? -1 : 1);
 				}
-
+				
 				// When pointer is in top left or bottom right corner
 				else if (topleft || bottomright) {
 					c = (Math.asin(b) * 180 / Math.PI - rotation) * Math.PI / 180;
-
+					
 					x = cX + Math.cos(c) * D * (topleft ? -1 : 1);
 					y = cY + Math.sin(c) * D * (topleft ? -1 : 1);
 				}
-
+				
 				return {
 					x: x,
 					y: y
 				};
 			},
-
+			
 			// Method for checking if the pointer's current position is inside the specified object
 			isPointerInside: function (obj, pointerObject) {
-
+			
 				var origin = obj.getOrigin();
-
+			
 				// Line
 				if (obj.type === "line") {
-
+				
 					// Get angle difference relative to if it had been horizontal
 					var dX = Math.abs(obj._.end_x - obj.abs_x),
 						dY = Math.abs(obj._.end_y - obj.abs_y),
@@ -1334,15 +1334,15 @@
 						e = obj.end,
 						factor = (s.x < e.x && s.y < e.y) || (s.x > e.x && s.y > e.y) ? -1 : 1,
 						angle = Math.asin(dY / D) * (180 / Math.PI) * factor,
-
+						
 						// Transform the pointer position with the angle correction
 						pointer = this.transformPointerPosition(obj, obj.abs_x, obj.abs_y, angle, pointerObject);
-
+					
 					// Check if pointer is inside the line
 					// Pointer coordinates are transformed to be compared with a horizontal line
 					return ((pointer.x > obj.abs_x - D - origin.x) && (pointer.x < obj.abs_x + D - origin.x) && (pointer.y > obj.abs_y - obj.strokeWidth / 2 - origin.y) && (pointer.y < obj.abs_y + obj.strokeWidth / 2 - origin.y));
 				} else
-
+				
 				// Text
 				if (obj.type === "text") {
 					var pointer = this.transformPointerPosition(obj, obj.abs_x, obj.abs_y, 0, pointerObject),
@@ -1388,25 +1388,25 @@
 							return true;
 						}
 					}
-
+					
 					return false;
 				} else
-
+				
 				// Rectangle
 				if (obj.shapeType === "rectangular") {
 					var pointer = this.transformPointerPosition(obj, obj.abs_x, obj.abs_y, 0, pointerObject),
 						stroke = (obj.strokePosition === "outside") ? obj.strokeWidth : ((obj.strokePosition === "center") ? obj.strokeWidth / 2 : 0);
-
+					
 					return ((pointer.x > obj.abs_x - origin.x - stroke) && (pointer.x < obj.abs_x + obj.width - origin.x + stroke) && (pointer.y > obj.abs_y - origin.y - stroke) && (pointer.y < obj.abs_y + obj.height - origin.y + stroke));
 				} else
-
+				
 				// Circle
 				if (obj.type === "ellipse" && obj.radius_x === obj.radius_y) {
 					var pointer = this.transformPointerPosition(obj, obj.abs_x, obj.abs_y, 0, pointerObject),
 						D = Math.sqrt(Math.pow(pointer.x - obj.abs_x + origin.x, 2) + Math.pow(pointer.y - obj.abs_y + origin.y, 2));
 					return (D < obj.radius_x + obj.strokeWidth / 2);
 				} else
-
+				
 				// Ellipse
 				if (obj.type === "ellipse") {
 					var pointer = this.transformPointerPosition(obj, obj.abs_x, obj.abs_y, 0, pointerObject),
@@ -1414,10 +1414,10 @@
 						b = obj.radius_y + obj.strokeWidth / 2;
 					pointer.x -= obj.abs_x + origin.x;
 					pointer.y -= obj.abs_y + origin.y;
-
+					
 					return ((pointer.x * pointer.x) / (a * a) + (pointer.y * pointer.y) / (b * b) < 1);
 				} else
-
+				
 				// Polygon
 				if (obj.type === "polygon") {
 					var pointer = this.transformPointerPosition(obj, obj.abs_x, obj.abs_y, 0, pointerObject),
@@ -1426,9 +1426,9 @@
 						j = length - 1,
 						odd = false,
 						i, thisPoint, prevPoint;
-
+						
 					for (i = 0; i < length; i++) {
-
+					
 						// Calulate positions for the points
 						thisPoint = {
 							x: (obj.abs_x - origin.x + (radius * Math.cos(i * 2 * Math.PI / length))),
@@ -1438,7 +1438,7 @@
 							x: (obj.abs_x - origin.x + (radius * Math.cos(j * 2 * Math.PI / length))),
 							y: (obj.abs_y - origin.y + (radius * Math.sin(j * 2 * Math.PI / length)))
 						};
-
+						
 						// Check how many edges we cross using odd parity
 						if ( ((thisPoint.y < pointer.y) && (prevPoint.y >= pointer.y)) || ((prevPoint.y < pointer.y) && (thisPoint.y >= pointer.y)) ) {
 							if (thisPoint.x + (pointer.y - thisPoint.y) / (prevPoint.y - thisPoint.y) * (prevPoint.x - thisPoint.x) < pointer.x) {
@@ -1447,10 +1447,10 @@
 						}
 						j = i;
 					}
-
+					
 					return odd;
 				} else
-
+				
 				// Arc
 				// Filled arcs, stroked arcs, stroked arcs that look like pie chart pieces
 				if (obj.type === "arc") {
@@ -1463,27 +1463,27 @@
 						eP = {},
 						p1 = {},
 						a, y_, z, angle;
-
+					
 					// Cancel if the distance between pointer and origin is longer than the radius
 					if ((obj.strokeWidth === 0 && D > radius) || (obj.strokeWidth > 0 && D > radius + obj.strokeWidth / 2)) {
 						return false;
 					}
-
+					
 					// If the arc is made like a pie chart piece
 					// (desired radius is set as stroke width and actual radius is set to half that size)
 					if (radius === obj.strokeWidth / 2 || obj.pieSection) {
 						var strokeWidth = obj.pieSection ? obj.radius : strokeWidth;
-
+					
 						if (angleRange > 180) {
-
+						
 							var pX, pY, pD, pA;
-
+							
 							// Calculate the distance between the pointer and origin, to find the angle
 							pX = Math.abs(obj.abs_x - origin.x - pointer.x),
 							pY = Math.abs(obj.abs_y - origin.y - pointer.y),
 							pD = Math.sqrt(pX * pX + pY * pY),
 							pA = Math.acos(pX / pD) * 180 / Math.PI;
-
+							
 							if (pointer.y >= obj.abs_y - origin.y && D <= strokeWidth) {
 								return true;
 							} else if (pointer.y < obj.abs_y - origin.y && pointer.x < obj.abs_x - origin.x && pA <= (angleRange - 180)) {
@@ -1491,36 +1491,36 @@
 							} else {
 								return false;
 							}
-
+						
 						} else if (angleRange === 180) {
-
+							
 							// Inside if pointer is below the origin
 							if (pointer.y >= obj.abs_y - origin.y && D <= strokeWidth) {
 								return true;
 							} else {
 								return false;
 							}
-
+							
 						} else if (angleRange < 180) {
-
+							
 							// Rotate the pointer position so that the angle is aligned in the bottom like a U
 							extraAngle = (90 - angleRange / 2 - (obj.direction === "clockwise" ? obj.start : obj.end));
 							pointer = this.transformPointerPosition(obj, obj.abs_x, obj.abs_y, extraAngle, pointerObject);
-
+							
 							var d, pX, pY, pD, pA;
-
+							
 							// Fix the radius for this type of arc
 							radius *= 2;
-
+							
 							// Calculate the distance from the origin to the y value of the end points
 							d = Math.cos(angleRange / 2 * Math.PI / 180) * radius;
-
+							
 							// Calculate the distance between the pointer and origin, to find the angle
 							pX = Math.abs(obj.abs_x - origin.x - pointer.x)
 							pY = Math.abs(obj.abs_y - origin.y - pointer.y);
 							pD = Math.sqrt(pX * pX + pY * pY);
 							pA = Math.asin(pX / pD) * 180 / Math.PI;
-
+							
 							if (pointer.y >= obj.abs_y - origin.y + d) {
 								return true;
 							} else if (pointer.y >= obj.abs_y - origin.y && pA <= angleRange / 2) {
@@ -1530,28 +1530,28 @@
 							}
 						}
 					}
-
+					
 					// If it's a normal arc
 					else {
-
+						
 						if (angleRange > 180) {
 							a = (360 - angleRange) / 2;
 							y_ = Math.cos(a * Math.PI / 180) * radius;
-
+							
 							eP.x = obj.abs_x - origin.x + Math.cos(a * Math.PI / 180) * y_;
 							eP.y = obj.abs_y - origin.y - Math.sin(a * Math.PI / 180) * y_;
-
-
+							
+							
 							z = 180 - 2 * a;
-
+							
 							p1.x = obj.abs_x - origin.x - Math.cos(z * Math.PI / 180) * radius;
 							p1.y = obj.abs_y - origin.y - Math.sin(z * Math.PI / 180) * radius;
-
+							
 							var aRight = 90 - (90 - z) - (90 - a);
-
+							
 							if (pointer.y < eP.y && pointer.x < eP.x) {
 								angle = a - Math.acos(Math.abs(pointer.y - eP.y) / Math.sqrt(Math.pow(pointer.x - eP.x, 2) + Math.pow(pointer.y - eP.y, 2))) * 180 / Math.PI;
-							} else
+							} else 
 							if (pointer.y > eP.y && pointer.x >= eP.x) {
 								angle = aRight - Math.acos(Math.abs(pointer.x - eP.x) / Math.sqrt(Math.pow(pointer.x - eP.x, 2) + Math.pow(pointer.y - eP.y, 2))) * 180 / Math.PI;
 							} else
@@ -1564,7 +1564,7 @@
 							if ((obj.fill === "" || obj.fill === "transparent") && (obj.strokeWidth > 0) && (D < radius - obj.strokeWidth / 2)) {
 								return false;
 							}
-
+							
 							if (angle <= 0 && pointer.x >= p1.x && pointer.y > eP.y && pointer.y < obj.abs_y - origin.y) {
 								return true;
 							} else if (angle <= 0 && pointer.y <= obj.abs_y - origin.y && D <= radius) {
@@ -1575,7 +1575,7 @@
 								return false;
 							}
 						} else if (angleRange === 180) {
-
+						
 							// Inside if pointer is below the origin
 							if (pointer.y >= obj.abs_y - origin.y && ((obj.strokeWidth === 0 && D <= radius) || (obj.strokeWidth > 0 && D <= radius + obj.strokeWidth / 2))) {
 								return true;
@@ -1583,22 +1583,22 @@
 								return false;
 							}
 						} else if (angleRange < 180) {
-
+						
 							// Rotate the pointer position so that the angle is aligned in the bottom like a U
 							extraAngle = (90 - angleRange / 2 - (obj.direction === "clockwise" ? obj.start : obj.end));
 							pointer = this.transformPointerPosition(obj, obj.abs_x, obj.abs_y, extraAngle, pointerObject);
-
+							
 							var r, d;
-
+							
 							// Make it a bit more accurate when there is only a stroke
 							r = (obj.fill === "") ? radius - obj.strokeWidth / 2 : radius;
-
+							
 							// Calculate the distance from the origin to the y value of the end points
 							d = Math.cos(angleRange / 2 * Math.PI / 180) * r;
-
+							
 							// If there is only a stroke
 							if (obj.fill === "" && obj.strokeWidth > 0) {
-
+							
 								// It has to be lower than the end points, and between the edges of the stroke
 								if (pointer.y >= obj.abs_y - origin.y + d && D >= radius - obj.strokeWidth / 2 && D <= radius + obj.strokeWidth / 2) {
 									return true;
@@ -1606,13 +1606,13 @@
 									return false;
 								}
 							}
-
+							
 							// If there is a fill and the y position of the pointer is below the end points
 							else if (pointer.y >= obj.abs_y - origin.y + d) {
-
+							
 								// If there is also a stroke
 								if (obj.strokeWidth > 0) {
-
+									
 									// If the distance from origin to pointer is less than to the outer edge of the stroke
 									if (D <= radius + obj.strokeWidth / 2) {
 										return true;
@@ -1620,13 +1620,13 @@
 										return false;
 									}
 								}
-
+								
 								// If no stroke, it is inside
 								else {
 									return true;
 								}
 							}
-
+							
 							// If the y position of the pointer is above the end points
 							else {
 								return false;
@@ -1634,16 +1634,16 @@
 						}
 					}
 				} else
-
+				
 				// Generic radial object
 				if (obj.shapeType === "radial") {
 					var radius = obj.radius ? obj.radius : 0;
-
+					
 					if (radius > 0) {
 						var pointer = this.transformPointerPosition(obj, obj.abs_x, obj.abs_y, 0, pointerObject),
 							origin = obj.getOrigin(),
 							D = Math.sqrt(Math.pow(pointer.x - obj.abs_x + origin.x, 2) + Math.pow(pointer.y - obj.abs_y + origin.y, 2));
-
+							
 						return (D < radius);
 					}
 				}
@@ -1660,7 +1660,7 @@
 
 	// Define the class
 	var events = function () {
-
+		
 		// Return an object when instantiated
 		return {
 
@@ -1995,19 +1995,19 @@
 				var properties = "altKey ctrlKey metaKey shiftKey button charCode keyCode clientX clientY pageX pageY screenX screenY detail eventPhase isChar touches targetTouches changedTouches scale rotation".split(" "),
 					numProps = properties.length,
 					eventObject, i, property, buttonConversion;
-
+				
 				// Fix specific properties and methods
 				eventObject = {
 					originalEvent: e,
 					timeStamp: (new Date()).getTime(),
 					which: e === undefined ? 0 : (e.which === 0 ? e.keyCode : e.which),
-
+					
 					preventDefault: function () {
 						if (e !== undefined) {
 							e.preventDefault();
 						}
 					},
-
+					
 					stopPropagation: function () {
 						if (this.bubbles) {
 							this.stoppingPropagation = true;
@@ -2070,7 +2070,7 @@
 
 	// Define the class
 	var draw = function () {
-
+		
 		// Return an object when instantiated
 		return {
 
@@ -2122,28 +2122,28 @@
 				// Update the array with the new values
 				obj.children = before.concat(middle).concat(after);
 			},
-
+			
 			// Method for clearing the canvas from everything that has been drawn (bg can be kept)
 			clear: function (keepBackground) {
 
 				// Clear all the image data on the canvas
 				this.core.canvas.clearRect(0, 0, this.core.width, this.core.height);
-
+				
 				// Redraw the background if it should be kept
 				if (keepBackground !== false) {
 					this.core.background.redraw();
 				}
-
+				
 				// Set a flag that will affect the value of the `drawn` property of display objects
 				this.isCleared = true;
 
 				return this;
 			},
-
+			
 			// Method for drawing all objects in the object list
 			redraw: function (forceClear) {
 				forceClear = forceClear || false;
-
+				
 				// Clear the canvas (keep the background)
 				if (this.core.settings.clearEachFrame || forceClear) {
 					this.clear();
@@ -2154,7 +2154,7 @@
 
 				// Draw all objects in the correct order
 				this.drawObjects(this.core.children);
-
+				
 				return this;
 			},
 
@@ -2165,7 +2165,7 @@
 				for (i = 0, l = objects.length; i < l; i++) {
 					obj = objects[i];
 					if ((obj !== undefined) && (typeof obj.draw === "function")) {
-
+						
 						// Update the object's properties if an update method is available
 						if (typeof obj.update === "function") {
 							obj.update();
@@ -2193,12 +2193,12 @@
 
 							// Translate the canvas matrix to the position of the object
 							canvas.translate(object.abs_x - lastX, object.abs_y - lastY);
-
+							
 							// If the object has a rotation, rotate the canvas matrix
 							if (object.rotation !== 0) {
 								canvas.rotate(object.rotation * Math.PI / 180);
 							}
-
+							
 							// Scale the canvas for this object
 							if (object.scalingX !== 1 || object.scalingY !== 1) {
 								canvas.scale(object.scalingX, object.scalingY);
@@ -2206,7 +2206,7 @@
 
 							// Scale the opacity
 							opacity *= object.opacity;
-
+							
 							// Save the current translation so that the next iteration can subtract that
 							lastX = object.abs_x;
 							lastY = object.abs_y;
@@ -2278,7 +2278,7 @@
 
 	// Define the class
 	var background = function () {
-
+		
 		// Return an object when instantiated
 		return {
 
@@ -2287,20 +2287,20 @@
 			value: "",
 			type: "transparent",
 			loaded: false,
-
+			
 			init: function () {
 				this.set(this.core.settings.background);
 			},
-
+			
 			// Method for setting the background
 			set: function (value) {
 				var _this = this;
 				if (typeof value !== "string") {
 					value = "";
 				}
-
+				
 				this.value = value;
-
+				
 				// Get background type (gradient, image, color or transparent)
 				if (~value.indexOf("gradient")) {
 					this.type = "gradient";
@@ -2311,10 +2311,10 @@
 				} else {
 					this.type = "transparent";
 				}
-
+				
 				// Handle the different background types
 				if (this.type === "color") {
-
+				
 					// Set color as background
 					this.bg = value;
 					if (this.core.timeline && !this.core.timeline.running) {
@@ -2323,7 +2323,7 @@
 					this.loaded = true;
 				}
 				else if (this.type === "gradient") {
-
+				
 					// Get gradient object and set it as background
 					this.bg = this.core.style ? this.core.style.getGradient(value, 0, 0, this.core.width, this.core.height) : "";
 					if (this.core.timeline && !this.core.timeline.running) {
@@ -2332,13 +2332,13 @@
 					this.loaded = true;
 				}
 				else if (this.type === "image") {
-
+				
 					// Parse image string
 					var matches = /image\((.*?)(,(\s|)(repeat|repeat-x|repeat-y|no-repeat)|)\)/.exec(value),
 						path = matches[1],
 						repeat = matches[4] || "repeat",
 						image = new Image();
-
+				
 					// Set image as background
 					image.src = path;
 					image.onload = function () {
@@ -2349,20 +2349,20 @@
 						}
 					};
 				}
-
+				
 				else {
 					// Background type is transparent, redraw the background (clears the canvas)
 					this.redraw(true);
 					this.loaded = true;
 				}
-
+				
 				return this;
 			},
-
+			
 			// Method for redrawing the background (replaces everything thas has been drawn)
 			redraw: function () {
 				var core = this.core;
-
+				
 				// Fill canvas with the background color if it's not transparent
 				if (this.type !== "transparent") {
 					core.canvas.fillStyle = this.bg;
@@ -2380,10 +2380,10 @@
 
 	// Define the class
 	var scenes = function () {
-
+		
 		// Return an object when instantiated
 		return {
-
+			
 			// Set properties
 			current: "none",
 			scenes: {},
@@ -2392,76 +2392,76 @@
 			create: function (name, init) {
 				this.scenes[name] = Object.create(this.scenesBase());
 				this.scenes[name].name = name;
-
+				
 				init.call(this.scenes[name]);
-
+				
 				return this.scenes[name];
 			},
-
+			
 			// Object base that will be instantiated for each new scene
 			scenesBase: function () {
-
+			
 				return {
 					name: "",
-
+				
 					// Container for all objects that are added to the scene
 					objects: [],
-
+					
 					loaded: false,
-
+					
 					// Method for adding objects to the scene
 					add: function (obj) {
 						this.objects.push(obj);
-
+						
 						// Add the object to canvas if the scene is loaded
 						if (this.loaded) {
 							obj.add();
 						}
-
+						
 						return this;
 					},
-
+					
 					// Method for removing an object from the scene
 					remove: function (obj) {
 						var index = this.objects.indexOf(obj);
 						if (~index) {
 							this.objects.splice(index, 1);
-
+								
 							// Remove the object from canvas if the scene is loaded
 							if (this.loaded) {
 								obj.remove();
 							}
 						}
-
+						
 						return this;
 					},
-
+					
 					// Method for loading the scene's objects
 					load: function () {
 						if (this.loaded) {
 							return;
 						}
-
+						
 						var objects = this.objects,
 							i, l = objects.length;
-
+							
 						// Loop through all added objects
 						for (i = 0; i < l; i++) {
 							if (objects[i] !== undefined) {
 								objects[i].add(false);
 							}
 						}
-
+						
 						this.loaded = true;
-
+						
 						return this;
 					},
-
+					
 					// Method for unloading the scene (removes all added objects from the canvas)
 					unload: function () {
 						var objects = this.objects,
 							i, l = objects.length;
-
+							
 						// Loop through all added objects
 						for (i = 0; i < l; i++) {
 							if (objects[i] !== undefined) {
@@ -2469,14 +2469,14 @@
 								objects[i].remove(false);
 							}
 						}
-
+						
 						this.loaded = false;
-
+						
 						return this;
 					}
 				};
 			},
-
+			
 			// Method for loading a specific scene
 			load: function (name, unload) {
 				// Unload last scene if not done already
@@ -2490,7 +2490,7 @@
 
 				return this;
 			},
-
+			
 			// Method for unloading a specific scene
 			unload: function (name) {
 				this.current = "none";
@@ -2511,7 +2511,7 @@
 
 	// Define the class
 	var style = function () {
-
+		
 		// Return an object when instantiated
 		return {
 
@@ -2519,7 +2519,7 @@
 			// Fixes errors if found
 			getStroke: function (value, return_type) {
 				return_type = (return_type === "string") ? "string" : "object";
-
+			
 				// Convert object to string with default values if unspecified
 				if (typeof value === "object" && return_type === "string") {
 					var val = value;
@@ -2541,38 +2541,38 @@
 				}
 				var color = parenEnd ? stroke.splice(parenStart, parenEnd - parenStart + 1) : undefined;
 				if (color) stroke.push(color.join(" "));
-
+			
 				// Get stroke settings
 				var strokePositions = ["outside", "center", "inside"];
 				var fixed_color = '', i, num_splits = stroke.length;
 				var strokePos, width, color, only_color;
-
+				
 				// If there are more than 2 splits
 				if (num_splits >= 3) {
-
+					
 					// If first split is not a valid stroke position
 					if (!~strokePositions.indexOf(stroke[0])) {
-
+					
 						// Boolean that says if only a color is specified
 						only_color = isNaN(parseInt(stroke[0]));
-
+						
 						// Loop through all the splits and concatenate the split color values
 						for (i = (only_color ? 0 : 1); i < num_splits; i++) {
 							fixed_color += stroke[i] + (i === num_splits - 1 ? " " : "");
 						}
-
+						
 						// Set the fixed stroke array
 						if (only_color) {
 							stroke = [1, fixed_color];
 						} else {
 							stroke = [stroke[0], fixed_color];
 						}
-
+						
 						// Set number of splits so the if case further down is entered
 						num_splits = 2;
-
+						
 					} else {
-
+					
 						// Fix color value
 						if (num_splits > 3) {
 							for (i = 2; i < num_splits; i++) {
@@ -2580,7 +2580,7 @@
 							}
 							stroke = [stroke[0], stroke[1], fixed_color];
 						}
-
+						
 						// Set the stroke object with correct values
 						stroke = {
 							pos: stroke[0],
@@ -2589,10 +2589,10 @@
 						};
 					}
 				}
-
+				
 				// If there are only two splits ( [width, color] )
 				if (num_splits === 2) {
-
+					
 					// Set the stroke object
 					stroke = {
 						pos: "center",
@@ -2600,7 +2600,7 @@
 						color: stroke[1]
 					};
 				}
-
+				
 				// If stroke is still an array (empty stroke value was passed in)
 				if (stroke.length) {
 					stroke = {
@@ -2609,7 +2609,7 @@
 						color: ""
 					};
 				}
-
+				
 				if (return_type === "string") {
 					return stroke.pos + " " + stroke.width + "px " + stroke.color;
 				}
@@ -2617,28 +2617,28 @@
 					return stroke;
 				}
 			},
-
+			
 			// Method for converting a gradient string to a gradient object
 			getGradient: function (value, x, y, width, height) {
 
 				if (~value.indexOf("linear")) {
 					return this.getLinearGradient(value, x, y, width, height);
-
+					
 				} else if (~value.indexOf("radial")) {
 					return this.getRadialGradient(value, x, y, width, height);
-
+					
 				} else {
 					return "transparent";
 				}
 			},
-
+			
 			// Method for converting a CSS style linear gradient to a CanvasGradient object
 			getLinearGradient: function (value, x, y, width, height) {
 				var gradient,
 					args, pos_parts, pos = [], i, start, sX, sY, eX, eY,
 					positions = ["top", "bottom", "left", "right"],
 					matchedColor, colorIndex, parenColors = [], colorStops, s;
-
+			
 				// Get arguments of the linear-gradient function, while preserving color values like hsla() and such
 				args = /\((.*)\)/.exec(value)[1];
 				while (matchedColor = /((hsl|hsla|rgb|rgba)\(.*?\))/.exec(args)) {
@@ -2646,10 +2646,10 @@
 					args = args.substring(0, matchedColor.index) + "###" + colorIndex + "###" + args.substring(matchedColor.index + matchedColor[1].length, args.length);
 				}
 				args = args.split(",");
-
+				
 				// Get position keywords
 				pos_parts = args[0].split(" ");
-
+				
 				// If the first keyword is a position, add it
 				if (~positions.indexOf(pos_parts[0]) || ~pos_parts[0].indexOf("deg")) {
 					pos.push(pos_parts[0]);
@@ -2664,7 +2664,7 @@
 				} else {
 					start = 1;
 				}
-
+				
 				// Get coordinates for start and ending points, based on the above position
 				// Get horizontal, vertical or degree specified coordinates
 				if (pos.length === 1) {
@@ -2693,17 +2693,17 @@
 							pi = Math.PI,
 							centerX = x + width / 2,
 							centerY = y + height / 2;
-
+						
 						// Convert the angle to the range 0 - 359 degrees and then convert it to radians
 						alpha = (parseFloat(pos) % 360) * pi / 180;
 						a = alpha;
-
+						
 						// Upper right corner
 						if (alpha >= 0 && alpha < pi / 2) {
 							cornerX = x + width;
 							cornerY = y;
 						}
-
+						
 						// Upper left corner
 						else if (alpha >= pi / 2 && alpha < pi) {
 							cY = centerY;
@@ -2712,7 +2712,7 @@
 							cornerX = cY;
 							centerX = y;
 						}
-
+						
 						// Bottom left corner
 						else if (alpha >= pi && alpha < pi * 1.5) {
 							cY = centerY;
@@ -2721,7 +2721,7 @@
 							centerY = y + height;
 							cornerY = cY;
 						}
-
+						
 						// Bottom right corner
 						else if (alpha >= pi * 1.5 && alpha < pi * 2) {
 							cY = centerY;
@@ -2730,20 +2730,20 @@
 							cornerX = y + height;
 							centerX = cY;
 						}
-
-
+						
+						
 						// Convert the angle to the range 0 - 89
 						alpha = alpha % (pi / 2);
-
+						
 						// Get angle between baseline and the line between the corner and the center
 						beta = Math.atan(Math.abs(centerY - cornerY) / Math.abs(cornerX - centerX));
-
+						
 						// Get the distance between the corner and the center
 						cornerDistance = Math.sqrt(Math.pow(centerY - cornerY, 2) + Math.pow(centerX - cornerX, 2));
-
+						
 						// Get the distance between the end point and the center
 						endDistance = cornerDistance * Math.cos(beta - (alpha));
-
+						
 						// Get end point and start point
 						// Upper right corner
 						if (a >= 0 && a < pi / 2) {
@@ -2752,7 +2752,7 @@
 							sX = centerX * 2 - eX;
 							sY = centerY * 2 - eY;
 						}
-
+						
 						// Upper left corner
 						else if (a >= pi / 2 && a < pi) {
 							eX = centerY - endDistance * Math.cos(pi / 2 - alpha);
@@ -2760,7 +2760,7 @@
 							sX = centerY * 2 - eX;
 							sY = cornerX * 2 - eY;
 						}
-
+						
 						// Bottom left corner
 						else if (a >= pi && a < pi * 1.5) {
 							eX = cornerX + endDistance * Math.cos(pi - alpha);
@@ -2768,7 +2768,7 @@
 							sX = cornerX * 2 - eX;
 							sY = cornerY * 2 - eY;
 						}
-
+						
 						// Bottom right corner
 						else if (a >= pi * 1.5 && a < pi * 2) {
 							eX = cornerY - endDistance * Math.cos(pi * 1.5 - alpha);
@@ -2777,7 +2777,7 @@
 							sY = centerX * 2 - eY;
 						}
 					}
-
+					
 				// Get diagonal coordinates
 				} else {
 					if (~pos.indexOf("top") && ~pos.indexOf("left")) {
@@ -2802,22 +2802,22 @@
 						eY = y;
 					}
 				}
-
+				
 				// Create the gradient object
 				gradient = this.core.canvas.createLinearGradient(sX, sY, eX, eY);
-
+				
 				// Get the color stops
 				colorStops = this.getColorStops(gradient, args.slice(start), parenColors);
-
+				
 				// Add the color stops to the gradient object
 				for (s = 0; s < colorStops.length; s++) {
 					gradient.addColorStop(colorStops[s].pos / 100, colorStops[s].color);
 				}
-
+				
 				// Return the gradient object
 				return gradient;
 			},
-
+			
 			// Method for converting a CSS style radial gradient to a CanvasGradient object
 			getRadialGradient: function (value, x, y, width, height) {
 				var gradient,
@@ -2829,7 +2829,7 @@
 					args, i, l, matchedColor, colorIndex, parenColors = [], colorStops, s,
 					pos_arg, num_pos_args = 0, circles = [{x:undefined,y:undefined,r:0}, {x:undefined,y:undefined,r:undefined}], p, p_key,
 					size_arg, size, size_set = false;
-
+				
 				// Get arguments of the radial-gradient function, while preserving color values like hsla() and such
 				args = /\((.*)\)/.exec(value)[1];
 				while (matchedColor = /((hsl|hsla|rgb|rgba)\(.*?\))/.exec(args)) {
@@ -2838,14 +2838,14 @@
 				}
 				args = args.split(/\s*,\s*/);
 				l = args.length;
-
+				
 				// Get position for start and end circles
 				for (i = 0; i < 2; i++) {
-
+					
 					// If the argument has two values
 					if (~args[i].indexOf(" ")) {
 						pos_arg = args[i].split(" ");
-
+						
 						// Get the different keywords
 						// Center
 						if (pos_arg[0] === "center") {
@@ -2853,40 +2853,40 @@
 							circles[i].y = pos_arg[1];
 							num_pos_args = i + 1;
 						}
-
+						
 						// Interpret X position for first value of the argument
 						else if (~bg_position_keywords_x.indexOf(pos_arg[0])) {
 							circles[i].x = pos_arg[0];
 							num_pos_args = i + 1;
-
+							
 							// Interpret Y position for second value of the argument
 							if (~bg_position_keywords_y.indexOf(pos_arg[1])) {
 								circles[i].y = pos_arg[1];
 							}
 						}
-
+						
 						// Interpret Y position for first value of the argument
 						else if (~bg_position_keywords_y.indexOf(pos_arg[0])) {
 							circles[i].y = pos_arg[0];
 							num_pos_args = i + 1;
-
+							
 							// Interpret Y position for second value of the argument
 							if (~bg_position_keywords_x.indexOf(pos_arg[1])) {
 								circles[i].x = pos_arg[1];
 							}
 						}
-
+						
 						// Interpret X position for first value of the argument and the value is numeric
 						else if (!isNaN(parseFloat(pos_arg[0]))) {
 							circles[i].x = pos_arg[0];
 							num_pos_args = i + 1;
-
+							
 							// Interpret Y position for second value of the argument (could be either keyword or numeric)
 							if (~bg_position_keywords_y.indexOf(pos_arg[1]) || !isNaN(parseFloat(pos_arg[1]))) {
 								circles[i].y = pos_arg[1];
 							}
 						}
-
+						
 						// Add the missing position values
 						if (!circles[i].x) {
 							circles[i].x = "center";
@@ -2895,10 +2895,10 @@
 							circles[i].y = "center";
 						}
 					}
-
+					
 					// If only one value was passed in as the argument
 					else {
-
+						
 						// Add position if it's a keyword for either an X or Y position
 						if (~bg_position_keywords_x.indexOf(args[i])) {
 							circles[i].x = args[i];
@@ -2907,41 +2907,41 @@
 							circles[i].y = args[i];
 							num_pos_args = i + 1;
 						}
-
+						
 						// If the position is not a valid keyword and this is the end circle,
 						// add the same position as the first circle has
 						else if (i === 1) {
 							circles[i].x = circles[0].x;
 						}
-
+						
 						// Add default position for the first value if nothing valid was passed in
 						else {
 							circles[i].x = "center";
 						}
-
-
+						
+						
 						// Since only one value was passed in, the second must be added here
 						// If this is the second position (end circle), use the first circle's position
 						if (i === 1) {
 							circles[i].y = circles[0].y;
 						}
-
+						
 						// Add default value if nothing value was passed in
 						else {
 							circles[i].y = "center";
 						}
 					}
 				}
-
-
+			
+			
 				// Get the size
-
+				
 				// Check for keywords
 				if (~sizes.indexOf(args[num_pos_args])) {
 					size = args[num_pos_args];
 					size_set = true;
 				}
-
+				
 				// Check for pixel or percentage value
 				if (/\d+(%|px)\s/.test(args[num_pos_args])) {
 					size = parseFloat(args[num_pos_args]);
@@ -2950,51 +2950,51 @@
 						size = 0;
 					}
 				}
-
+				
 				// Defaults if no correct values were passed in
 				if (size === undefined) {
 					size = "cover";
 				}
-
-
-
+				
+				
+				
 				// Convert all positions to actual pixel sizes relative to the top left corner of the canvas
 				for (i = 0; i < 2; i++) {
-
+				
 					// Get pixel sizes for keywords
 					circles[i].abs_x = bg_position_sizes_x[circles[i].x];
 					circles[i].abs_y = bg_position_sizes_y[circles[i].y];
-
+					
 					// Loop through both x and y
 					for (p = 0; p < 2; p++) {
-
+					
 						p_key = "abs_" + (p === 0 ? "x" : "y");
-
+					
 						// If the value was not found, it is not a keyword – it is probably a number
 						if (circles[i][p_key] === undefined) {
-
+						
 							// Get the number
 							circles[i][p_key] = parseFloat(circles[i][(p_key === "abs_x" ? "x" : "y")]);
-
+							
 							// If it was not a number, get the center value
 							if (isNaN(circles[i][p_key])) {
 								circles[i][p_key] = (p_key === "abs_x") ? bg_position_sizes_x.center - x : bg_position_sizes_y.center - y;
 							}
-
+							
 							// If it was a percentage, convert it to an actual pixel size
 							if (~circles[i][(p_key === "abs_x" ? "x" : "y")].indexOf("%")) {
 								circles[i][p_key] = (circles[i][p_key] / 100) * (p_key === "abs_x" ? width : height);
 							}
-
+							
 							// Add the x offset to make the position relative to the left corner of the canvas
 							circles[i][p_key] += (p_key === "abs_x") ? x : y;
 						}
 					}
 				}
-
-
+				
+				
 				// Convert the size to actual pixels
-
+				
 				// Check for keywords
 				if (~sizes.indexOf(size)) {
 					if (size === "closest-side" || size === "contain") {
@@ -3029,10 +3029,10 @@
 						size = 0;
 					}
 				}
-
+				
 				// Check for a percentage
 				if (~args[num_pos_args].indexOf("%")) {
-
+					
 					// Convert it to pixels relative to the specified dimension. Defaults to width
 					if (~args[num_pos_args].indexOf(" ")) {
 						size_arg = args[num_pos_args].split(" ")[1] === "height" ? height : width;
@@ -3041,40 +3041,40 @@
 					}
 					size = (size / 100) * size_arg;
 				}
-
+				
 				// Set the radius for the end circle
 				circles[1].r = size;
-
+				
 				// Create the gradient object
 				gradient = this.core.canvas.createRadialGradient(circles[0].abs_x, circles[0].abs_y, circles[0].r, circles[1].abs_x, circles[1].abs_y, circles[1].r);
-
+				
 				// Get the color stops
 				colorStops = this.getColorStops(gradient, args.slice(num_pos_args + (size_set ? 1 : 0)), parenColors);
-
+				
 				// Add the color stops to the gradient object
 				for (s = 0; s < colorStops.length; s++) {
 					gradient.addColorStop(colorStops[s].pos / 100, colorStops[s].color);
 				}
-
+				
 				return gradient;
 			},
-
+			
 			// Method for getting color stops
 			getColorStops: function (gradient, stops, parenColors) {
-
+			
 				var i, l = stops.length,
 					colorStop, stop_parts, color, color_pos, colorStops = [];
-
+			
 				// Loop through all color stops
 				for (i = 0; i < l; i++) {
 					colorStop = stops[i].trim();
-
+					
 					// If the last position was more than or equal to 100 %,
 					// the following would not be visible anyway, so setting it is unnecessary
 					if (color_pos >= 100) {
 						break;
 					}
-
+					
 					// Split the color stop value to separate the color from the position
 					// Using space is OK, since hsla() values and such are stripped away up at the top
 					// Positions outside the range 0 - 100 % are not supported at the moment
@@ -3082,7 +3082,7 @@
 						stop_parts = colorStop.split(" ");
 						color = stop_parts[0];
 						color_pos = stop_parts[1];
-
+						
 						// Convert a pixel value to a percentage
 						if (~color_pos.indexOf("px")) {
 							color_pos = parseFloat(color_pos) / Math.sqrt(Math.pow(eX - sX, 2) + Math.pow(eY - sY, 2)) * 100;
@@ -3090,42 +3090,42 @@
 							color_pos = parseFloat(color_pos);
 						}
 					}
-
+					
 					// No position was specified, so one will be generated
 					else {
 						color = colorStop;
-
+						
 						// Set first position to 0 if not set before
 						if (color_pos === undefined) {
 							color_pos = 0;
 						}
-
+						
 						// Set the next position if it's not the first one
 						else {
 							color_pos = color_pos || 0;
 							color_pos = color_pos + ((100 - color_pos) / (l - i));
 						}
 					}
-
+					
 					// Get the saved color value if the color contained parentheses when passed in to this method
 					if (~color.indexOf("###")) {
 						color = parenColors[/###(\d+)###/.exec(color)[1]];
 					}
-
+					
 					// Add color data to an array with all color stops
 					colorStops.push({
 						pos: color_pos,
 						color: color
 					});
 				}
-
+				
 				return colorStops;
 			},
-
+			
 			// Method for converting a font to either a string or an object
 			getFont: function (value, return_type) {
 				return_type = (return_type === "string") ? "string" : "object";
-
+				
 				// Convert object to string with default values if unspecified
 				if (typeof value === "object" && return_type === "string") {
 					var val = value;
@@ -3137,9 +3137,9 @@
 						(typeof val.lineHeight === "string" ? (val.lineHeight.indexOf("px") > -1 ? val.lineHeight : 1) : 1));
 					value += " " + (typeof val.family === "string" ? val.family : "sans-serif");
 				}
-
+				
 				if (value.length > 0) {
-
+				
 					// Get font settings
 					var font = value.split(" "),
 						l = font.length,
@@ -3148,10 +3148,10 @@
 						variants = ["normal", "small-caps"],
 						weights = ["normal", "bold", "bolder", "lighter", "100", "200", "300", "400", "500", "600", "700", "800", "900"],
 						font_object = {};
-
+					
 					for (i = 0; i < l; i++) {
 						value = font[i];
-
+						
 						// Font style
 						if (~styles.indexOf(value) && !font_object.style) {
 							font_object.style = value;
@@ -3164,7 +3164,7 @@
 						if (~weights.indexOf(value) && !font_object.weight) {
 							font_object.weight = value;
 						} else
-
+	
 						if (~value.indexOf("/") && !font_object.size && !font_object.lineHeight) {
 							splits = value.split("/");
 							// Font size
@@ -3177,14 +3177,14 @@
 								font_object.lineHeightUnit = splits[1].indexOf("px") > -1 ? "px" : "relative";
 							}
 						} else
-
+						
 						if (!font_object.size && /\d+[a-z]{2}(?!\/)/.test(value)) {
 							// Font size
 							if (!isNaN(parseInt(value))) {
 								font_object.size = parseInt(value);
 							}
 						} else
-
+						
 						// Font family
 						if (isNaN(parseInt(value)) && !font_object.family) {
 							family = "";
@@ -3195,7 +3195,7 @@
 						}
 					}
 				}
-
+				
 				// Set default values if unspecified
 				font = font_object || {};
 				font.style = font.style ? font.style : "normal";
@@ -3205,7 +3205,7 @@
 				font.lineHeight = font.lineHeight !== undefined ? font.lineHeight : 1;
 				font.lineHeightUnit = font.lineHeightUnit !== undefined ? font.lineHeightUnit : "relative";
 				font.family = font.family ? font.family : "sans-serif";
-
+				
 				if (return_type === "string") {
 					return font.style + " " + font.variant + " " + font.weight + " " + font.size + "px/" +
 						font.lineHeight + (font.lineHeightUnit === "px" ? "px" : "") + " " + font.family;
@@ -3214,11 +3214,11 @@
 					return font;
 				}
 			},
-
+			
 			// Method for converting a shadow to either an object or a string
 			getShadow: function (value, return_type) {
 				var shadow = {}, values;
-
+				
 				// Correct errors if any when an object is passed in
 				if (typeof value === "object") {
 					shadow.offsetX = !isNaN(parseFloat(value.offsetX)) ? parseFloat(value.offsetX) : 0;
@@ -3226,24 +3226,24 @@
 					shadow.blur = !isNaN(parseFloat(value.blur)) ? parseFloat(value.blur) : 0;
 					shadow.color = this.isColor(value.color) ? value.color : "#000";
 				}
-
+				
 				// Parse the values if a string was passed in
 				else if (typeof value === "string") {
-
+					
 					var values = /^(.*?)\s(.*?)\s(.*?)\s(.*?)$/.exec(value);
 					shadow.offsetX = !isNaN(parseFloat(values[1])) ? parseFloat(values[1]) : 0;
 					shadow.offsetY = !isNaN(parseFloat(values[2])) ? parseFloat(values[2]) : 0;
 					shadow.blur = !isNaN(parseFloat(values[3])) ? parseFloat(values[3]) : 0;
 					shadow.color = this.isColor(values[4]) ? values[4] : "#000";
 				}
-
+				
 				if (return_type === "string") {
 					return shadow.offsetX + "px " + shadow.offsetY + "px " + shadow.blur + "px " + shadow.color;
 				} else {
 					return shadow;
 				}
 			},
-
+			
 			// Method for checking if a value is a color or not
 			isColor: function (value) {
 				if (typeof value === "string" && (value[0] === "#" || value.substr(0, 4) === "rgb(" || value.substr(0, 5) === "rgba(" || value.substr(0, 4) === "hsl(" || value.substr(0, 5) === "hsla(")) {
@@ -3949,14 +3949,14 @@
 
 	// Define the class
 	var displayObject = function () {
-
+	
 		// Method for setting a stroke property. Updates both obj.stroke and obj.property
 		var setStrokeProperty = function (_this, property, value, objectProperty, thecore) {
 			var stroke = thecore.style.getStroke(_this.stroke);
 			stroke[property] = value;
 			_this.stroke = thecore.style.getStroke(stroke, "string");
 		};
-
+		
 		// Return an object when instantiated
 		return {
 
@@ -3978,7 +3978,7 @@
 			scalingY: 1,
 			pointerEvents: true,
 			animationQueues: {},
-
+			
 			_: {
 				x: 0,
 				y: 0,
@@ -4003,7 +4003,7 @@
 					color: "transparent"
 				}
 			},
-
+			
 			set strokeColor (color) {
 				setStrokeProperty(this, "color", color, "strokeColor", this.core);
 			},
@@ -4014,15 +4014,15 @@
 				setStrokeProperty(this, "pos", pos, "strokePosition", this.core);
 			},
 			set stroke (value) {
-
+			
 				// Convert the value to a correct string if it is not a string
 				if (typeof value !== "string") {
 					value = this.core.style.getStroke(value, "string");
 				}
-
+				
 				// Get stroke object and set styles
 				var stroke = this.core.style.getStroke(value);
-
+				
 				// Handle patterns
 				if (~stroke.color.indexOf("image(")) {
 					var matches = /image\((.*?)(,(\s|)(repeat|repeat-x|repeat-y|no-repeat)|)\)/.exec(stroke.color),
@@ -4030,15 +4030,15 @@
 						repeat = matches[4] || "repeat",
 						image = new Image(),
 						_this = this;
-
+						
 					image.src = path;
 					this._.strokepattern_loading = true;
 					this._.strokepattern_redraw = false;
-
+					
 					image.onload = function () {
 						_this._.strokeColor = _this.core.canvas.createPattern(this, repeat);
 						_this._.strokepattern_loading = false;
-
+						
 						if (_this._.strokepattern_redraw) {
 							_this._.strokepattern_redraw = false;
 							_this.redraw();
@@ -4047,7 +4047,7 @@
 				} else {
 					this._.strokeColor = stroke.color;
 				}
-
+				
 				// Set other stroke properties
 				this._.strokeWidth = stroke.width;
 				this._.strokePosition = stroke.pos;
@@ -4103,7 +4103,7 @@
 			get miterLimit () {
 				return this._.miterLimit;
 			},
-
+			
 			set fill (value) {
 				if (~value.indexOf("image(")) {
 					var matches = /image\((.*?)(,(\s|)(repeat|repeat-x|repeat-y|no-repeat)|)\)/.exec(value),
@@ -4111,15 +4111,15 @@
 						repeat = matches[4] || "repeat",
 						image = new Image(),
 						_this = this;
-
+						
 					image.src = path;
 					this._.pattern_loading = true;
 					this._.pattern_redraw = false;
-
+					
 					image.onload = function () {
 						_this._.fill = _this.core.canvas.createPattern(this, repeat);
 						_this._.pattern_loading = false;
-
+						
 						if (_this._.pattern_redraw) {
 							_this._.pattern_redraw = false;
 							_this.redraw();
@@ -4147,12 +4147,12 @@
 				}
 			},
 			set shadow (value) {
-
+			
 				// Convert the value to a correct string if it is not a string
 				if (typeof value !== "string") {
 					value = this.core.style.getShadow(value, "string");
 				}
-
+				
 				// Get shadow object and set styles
 				var shadow = this.core.style.getShadow(value);
 				this._.shadow = shadow;
@@ -4192,11 +4192,11 @@
 			get shadowColor () {
 				return this._.shadow.color;
 			},
-
+			
 			set x (value) {
 				this._.x = value;
 				this._.abs_x = value + ((this.parent !== undefined && this.parent !== this.core) ? this.parent.abs_x : 0);
-
+				
 				// Update children
 				var objects = this.children,
 					l = objects.length, i;
@@ -4208,7 +4208,7 @@
 			set y (value) {
 				this._.y = value;
 				this._.abs_y = value + ((this.parent !== undefined && this.parent !== this.core) ? this.parent.abs_y : 0);
-
+				
 				// Update children
 				var objects = this.children,
 					l = objects.length, i;
@@ -4272,37 +4272,37 @@
 			set drawn (value) {
 				this._.drawn = !!value;
 			},
-
+			
 			// Method for binding an event to the object
 			bind: function (types, handler) {
 				this.core.events.bind(this, types.split(" "), handler);
-
+				
 				return this;
 			},
-
+			
 			// Method for unbinding an event from the object
 			unbind: function (types, handler) {
 				this.core.events.unbind(this, types.split(" "), handler);
-
+				
 				return this;
 			},
-
+			
 			// Method for triggering all events added to the object
 			trigger: function (types, eventObject) {
 				var events = this.core.events;
 				var chain = events.getParentChain(this, true, true);
 				events.triggerChain(chain, types.split(" "), events.fixEventObject(eventObject));
-
+				
 				return this;
 			},
-
+			
 			// Method for adding the object to the canvas
 			add: function (redraw) {
 				if (!this.added) {
 
 					// Redraw by default, but leave it to the user to decide
 					redraw = redraw !== undefined ? redraw : true;
-
+				
 					// Add this object
 					this.core.children.push(this);
 					this.added = true;
@@ -4310,16 +4310,16 @@
 
 					// Add it to a global list of all objects. Deprecated list, will be removed soon.
 					this.core.draw.objects.push(this);
-
+					
 					// Redraw the canvas with the new object
 					if (redraw) {
 						this.core.draw.redraw();
 					}
 				}
-
+				
 				return this;
 			},
-
+			
 			// Method for removing the object from the canvas
 			remove: function (redraw) {
 
@@ -4360,36 +4360,36 @@
 						this.core.draw.redraw();
 					}
 				}
-
+				
 				return this;
 			},
-
+			
 			// Method for drawing the shape
 			draw: function () {
-
+				
 			},
-
+			
 			// Method for redrawing the canvas
 			redraw: function () {
 				this.core.draw.redraw();
-
+				
 				return this;
 			},
-
+			
 			// Method for rotating the object
 			rotate: function (angle) {
 				this.rotation += angle;
-
+				
 				return this;
 			},
-
+			
 			// Method for rotating to a specific angle
 			rotateTo: function (angle) {
 				this.rotation = angle;
-
+				
 				return this;
 			},
-
+			
 			// Method for getting x/y arguments, with the ability to choose only one
 			// Used by other methods
 			//   Examples:
@@ -4399,8 +4399,8 @@
 			getArgs: function (x, y, default_x, default_y) {
 				default_x = default_x || 0;
 				default_y = default_y || 0;
-
-				// Second argument is string
+				
+				// Second argument is string 
 				if (typeof y === "string") {
 					var type = y,
 						val = x;
@@ -4410,68 +4410,68 @@
 				else if (y === undefined) {
 					y = x;
 				}
-
+				
 				return {
 					x: x,
 					y: y
 				};
 			},
-
+			
 			// Method for moving the object
 			move: function (x, y) {
 				var change = this.getArgs(x, y);
 				this.x += change.x;
 				this.y += change.y;
-
+				
 				return this;
 			},
-
+			
 			// Method for moving to a specific position
 			moveTo: function (x, y) {
 				var pos = this.getArgs(x, y, this.x, this.y);
 				this.x = pos.x;
 				this.y = pos.y;
-
+				
 				return this;
 			},
-
+			
 			// Method for scaling the object
 			scale: function (x, y) {
 				var scaling = this.getArgs(x, y, 1, 1);
 				this.scalingX = scaling.x;
 				this.scalingY = scaling.y;
-
+				
 				return this;
 			},
-
+			
 			// Method for scaling to a specific size
 			scaleTo: function (width, height) {
 				var currentWidth = (this.shapeType === "rectangular" ? this.width : this.radius),
 					currentHeight = (this.shapeType === "rectangular" ? this.height : this.radius),
 					size = this.getArgs(width, height, currentWidth, currentHeight);
-
+					
 				// Don't let the size be 0, because the native scale method doesn't support zero values
 				size.x = size.x <= 0 ? 1 : size.x;
 				size.y = size.y <= 0 ? 1 : size.y;
-
+				
 				// Set the scaling
 				this.scalingX = size.x / currentWidth;
 				this.scalingX = size.y / currentHeight;
-
+				
 				return this;
 			},
-
+			
 			// Method for animating any numeric property
 			animate: function () {
 				this.core.animation.animate(this, arguments);
-
+				
 				return this;
 			},
-
+			
 			// Method for clearing the object's animation queue and stop the animations
 			stop: function () {
 				this.core.animation.stop(this);
-
+				
 				return this;
 			},
 
@@ -4488,56 +4488,56 @@
 
 				return this;
 			},
-
+			
 			// Method for changing the opacity property to 1 as an animation
 			fadeIn: function () {
 				var args = Array.prototype.slice.call(arguments);
 				this.core.animation.animate(this, [{ opacity: 1 }].concat(args));
-
+				
 				return this;
 			},
-
+			
 			// Method for changing the opacity property to 0 as an animation
 			fadeOut: function () {
 				var args = Array.prototype.slice.call(arguments);
 				this.core.animation.animate(this, [{ opacity: 0 }].concat(args));
-
+				
 				return this;
 			},
-
+			
 			// Method for changing the opacity property to a custom value as an animation
 			fadeTo: function () {
 				var args = Array.prototype.slice.call(arguments);
 				this.core.animation.animate(this, [{ opacity: args.splice(0, 1)[0] }].concat(args));
-
+				
 				return this;
 			},
-
+			
 			// Method for making drag and drop easier
 			dragAndDrop: function (options) {
-
+			
 				options = (options === undefined) ? {} : options;
-
+			
 				// If false is passed as argument, remove all event handlers
 				if (options === false && this.draggable === true) {
 					this.draggable = false;
-
+					
 					this.unbind("mousedown touchstart", this._.drag_start)
 					this.core.unbind("mouseup touchend", this._.drag_end);
 					this.core.unbind("mousemove touchmove", this._.drag_move);
 				}
-
+				
 				// Otherwise add event handlers, unless they have been added before
 				else if (!this.draggable) {
-
+				
 					this.draggable = true;
 					this.dragging = false;
-
+				
 					var _this = this,
 						offset = { x: 0, y: 0 },
 						startPos = { x: 0, y: 0 },
 						start = { x: 0, y: 0 };
-
+					
 					this._.drag_start = function (e) {
 
 						// Stop bubbling if specified
@@ -4546,7 +4546,7 @@
 						}
 
 						this.dragging = true;
-
+						
 						// Get the difference between pointer position and object position
 						offset.x = e.x - this.x;
 						offset.y = e.y - this.y;
@@ -4558,18 +4558,18 @@
 						if (options.changeZindex === true) {
 							this.zIndex = "front";
 						}
-
+						
 						// Run user callback
 						if (typeof options.start === "function") {
 							options.start.call(this);
 						}
-
+						
 						// Redraw the canvas if the timeline is not running
 						if (!this.core.timeline.running) {
 							this.core.draw.redraw();
 						}
 					};
-
+					
 					this._.drag_end = function (e) {
 						if (_this.dragging) {
 
@@ -4579,19 +4579,19 @@
 							}
 
 							_this.dragging = false;
-
+							
 							// Run user callback
 							if (typeof options.end === "function") {
 								options.end.call(_this);
 							}
-
+							
 							// Redraw the canvas if the timeline is not running
 							if (!_this.core.timeline.running) {
 								_this.core.draw.redraw();
 							}
 						}
 					};
-
+					
 					this._.drag_move = function (e) {
 						if (_this.dragging) {
 
@@ -4599,33 +4599,33 @@
 							if (options.bubble === false) {
 								e.stopPropagation();
 							}
-
+						
 							var end = _this.core.tools.transformPointerPosition(_this, _this.abs_x, _this.abs_y, _this.rotation);
 
 							_this.x = startPos.x + end.x - start.x;
 							_this.y = startPos.y + end.y - start.y;
-
+							
 							// Run user callback
 							if (typeof options.move === "function") {
 								options.move.call(_this);
 							}
-
+							
 							// Redraw the canvas if the timeline is not running
 							if (!_this.core.timeline.running) {
 								_this.core.draw.redraw();
 							}
 						}
 					};
-
+					
 					// Bind event handlers
 					this.bind("mousedown touchstart", this._.drag_start)
 					this.core.bind("mouseup touchend", this._.drag_end);
 					this.core.bind("mousemove touchmove", this._.drag_move);
 				}
-
+				
 				return this;
 			},
-
+			
 			// Method for setting the origin coordinates
 			// Accepts pixel values or the following keywords:
 			//     x: left | center | right
@@ -4633,16 +4633,16 @@
 			setOrigin: function (x, y) {
 				this.origin.x = x;
 				this.origin.y = y;
-
+				
 				return this;
 			},
-
+			
 			// Method for getting the current origin coordinates in pixels
 			getOrigin: function () {
 				var x, y,
 					origin = this.origin,
 					shapeType = this.shapeType;
-
+				
 				// Get X coordinate in pixels
 				if (origin.x === "center") {
 					x = (shapeType === "rectangular") ? this.width / 2 : 0;
@@ -4653,7 +4653,7 @@
 				} else {
 					x = !isNaN(parseFloat(origin.x)) ? parseFloat(origin.x) : 0;
 				}
-
+				
 				// Get Y coordinate in pixels
 				if (origin.y === "center") {
 					y = (shapeType === "rectangular") ? this.height / 2 : 0;
@@ -4664,24 +4664,24 @@
 				} else {
 					y = !isNaN(parseFloat(origin.y)) ? parseFloat(origin.y) : 0;
 				}
-
+				
 				// Return pixel coordinates
 				return {
 					x: x,
 					y: y
 				};
 			},
-
+			
 			// Method for adding a child to the display object
 			// Children will transform accordingly when this display object transforms
 			addChild: function (childObj, returnIndex) {
-
+			
 				// Check if the child object doesn't already have a parent
 				if (childObj.parent === undefined) {
-
+				
 					// Add the object as a child
 					var index = this.children.push(childObj) - 1;
-
+					
 					// Update child
 					childObj.parent = this;
 					childObj.x += 0;
@@ -4689,42 +4689,42 @@
 
 					// Add it to a global list of all objects. Deprecated list, will be removed soon.
 					this.core.draw.objects.push(childObj);
-
+					
 					// Redraw the canvas if this object is drawn, to show the new child object
 					if (this.drawn) {
 						this.core.draw.redraw();
 					}
-
+					
 					if (returnIndex) {
 						return index;
 					}
 				} else if (returnIndex) {
 					return false;
 				}
-
+				
 				// Return the object itself if user chose to not get the index in return
 				return this;
 			},
-
+			
 			// Method for removing a child
 			removeChild: function (childObj, redraw) {
 				var index = this.children.indexOf(childObj);
 				if (~index) {
 					this.removeChildAt(index, redraw);
 				}
-
+				
 				return this;
 			},
-
+			
 			// Method for removing a child at a specific index
 			removeChildAt: function (index, redraw) {
 				if (this.children[index] !== undefined) {
 					this.children[index].remove(redraw);
 				}
-
+				
 				return this;
 			},
-
+			
 			// Method for creating a clone of this object
 			clone: function (settings) {
 				settings = settings || {};
@@ -4736,7 +4736,7 @@
 					absoluteX = ['abs_x', 'start_x', 'end_x'],
 					absoluteY = ['abs_y', 'start_y', 'end_y'],
 					loopObject, x, stroke, i, children, child, dX, dY, descriptor;
-
+				
 				// Filter out the setter and getter methods, and also properties listed above
 				loopObject = function (obj, destination) {
 					for (x in obj) {
@@ -4775,20 +4775,20 @@
 					}
 				}
 				loopObject(this, this_filtered);
-
+				
 				// Fix gradients and patterns
 				this_filtered.fill = this._.fill;
 				stroke = this.core.style.getStroke(this.stroke);
 				this_filtered.strokeColor = stroke.color;
-
+				
 				// Extend the new object with this object's properties and then apply the custom settings
 				newObj = oCanvas.extend(newObj, this_filtered, settings);
 				newObj.id = ++this.core.lastObjectID;
-
+				
 				if (typeof newObj.init === "function") {
 					newObj.init();
 				}
-
+				
 				// Add children to the new clone
 				children = this.children;
 				if (children.length > 0) {
@@ -4806,33 +4806,33 @@
 						}
 					}
 				}
-
+				
 				return newObj;
 			},
-
+			
 			// Method for checking if the pointer is inside the object
 			isPointerInside: function (pointer) {
 				return this.core.tools.isPointerInside(this, pointer);
 			}
 		};
 	},
-
+	
 	// Method for registering a custom display object at run time
 	// It is only attached to the current core instance
 	register = function (name, properties, draw, init) {
 		var display = this,
 			core = this.core,
-
+			
 			// The object that will be instantiated
 			obj = function (settings, thecore) {
-
+			
 				// Return an object containing base properties, core access and a draw wrapper
 				// The object is extended with properties set on register, and settings set on instantiation
 				return oCanvas.extend({
 					core: thecore,
 					type: name,
 					shapeType: "rectangular",
-
+					
 					// Wrapper for the draw method. This enables the callback to work internally and gives the user
 					// access to the canvas context and the core
 					draw: function () {
@@ -4842,56 +4842,56 @@
 					}
 				}, properties, settings);
 			};
-
+		
 		// Add the constructor function to core.display.name
 		this[name] = function (settings) {
-
+		
 			// Instantiate a new custom object with specified settings
 			var retObj = oCanvas.extend(Object.create(displayObject()), new obj(settings, core));
-
+			
 			// Run initialization method if provided
 			if (init !== undefined && typeof display[name][init] === "function") {
 				display[name][init]();
 			}
-
+			
 			// Return the new object
 			return retObj;
 		};
-
+		
 		return display;
 	};
-
+	
 	// Register the module
 	oCanvas.registerModule("displayObject", displayObject);
-
+	
 	// Second namespace where objects gets placed
 	oCanvas.registerModule("display", { wrapper: true, register: register });
-
-
-
+	
+	
+	
 	// Add method to oCanvas to enable display objects to be added
 	oCanvas.registerDisplayObject = function (name, obj, init) {
-
+	
 		// Register the object as a submodule to display
 		oCanvas.registerModule("display."+name, {
-
+		
 			// Method for getting the core instance
 			setCore: function (thecore) {
-
+			
 				// Method that core.display.objectname will refer to
 				return function (settings) {
-
+				
 					// Create a new object that inherits from displayObject
 					var retObj = oCanvas.extend(Object.create(displayObject()), new obj(settings, thecore));
 					retObj.type = name;
 					retObj.id = ++thecore.lastObjectID;
 					thecore.animation.queues.create(retObj, "default");
-
+					
 					// Trigger an init method if specified
 					if (init !== undefined) {
 						retObj[init]();
 					}
-
+					
 					// Return the new object
 					return retObj;
 				};
@@ -4905,67 +4905,67 @@
 
 	// Define the class
 	var rectangle = function (settings, thecore) {
-
+		
 		// Return an object when instantiated
 		return oCanvas.extend({
 			core: thecore,
-
+			
 			shapeType: "rectangular",
-
+			
 			draw: function () {
 				var canvas = this.core.canvas,
 					origin = this.getOrigin(),
 					x = this.abs_x - origin.x,
 					y = this.abs_y - origin.y;
-
+				
 				canvas.beginPath();
-
+				
 				// Do fill if a color is specified
 				if (this.fill !== "") {
 					canvas.fillStyle = this.fill;
 					canvas.fillRect(x, y, this.width, this.height);
 				}
-
+				
 				// Do color if stroke width is specified
 				if (this.strokeWidth > 0) {
-
+				
 					// Set styles
 					canvas.lineWidth = this.strokeWidth;
 					canvas.strokeStyle = this.strokeColor;
-
+					
 					// Set stroke outside the box
 					if (this.strokePosition === "outside") {
 						canvas.strokeRect(x - this.strokeWidth / 2, y - this.strokeWidth / 2, this.width + this.strokeWidth, this.height + this.strokeWidth);
 					}
-
+					
 					// Set stroke on the edge of the box (half of the stroke outside, half inside)
 					else if (this.strokePosition === "center") {
 						canvas.strokeRect(x, y, this.width, this.height);
 					}
-
+					
 					// Set stroke on the inside of the box
 					else if (this.strokePosition === "inside") {
 						canvas.strokeRect(x + this.strokeWidth / 2, y + this.strokeWidth / 2, this.width - this.strokeWidth, this.height - this.strokeWidth);
 					}
 				}
-
+				
 				canvas.closePath();
-
+				
 				return this;
 			}
-
+			
 		}, settings);
 	};
-
+	
 	// Register the display object
 	oCanvas.registerDisplayObject("rectangle", rectangle);
-
+	
 
 
 
 	// Define the class
 	var image = function (settings, thecore) {
-
+		
 		// Return an object when instantiated
 		return oCanvas.extend({
 			core: thecore,
@@ -4973,7 +4973,7 @@
 			_: oCanvas.extend({}, thecore.displayObject._, {
 				hasBeenDrawn: false
 			}),
-
+			
 			shapeType: "rectangular",
 			loaded: false,
 			firstDrawn: false,
@@ -4982,7 +4982,7 @@
 			tile_height: 0,
 			tile_spacing_x: 0,
 			tile_spacing_y: 0,
-
+			
 			// Init method for loading the image resource
 			init: function () {
 				var _this = this,
@@ -4994,11 +4994,11 @@
 				}
 
 				this.img = new Image();
-
+				
 				// Get dimensions when the image is loaded. Also, remove the temp img from DOM
 				this.img.onload = function () {
 					_this.loaded = true;
-
+					
 					// Set dimensions proportionally (if only one is specified, calculate the other)
 					if (_this.width !== 0) {
 						if (_this.height === 0) {
@@ -5021,7 +5021,7 @@
 
 				this.img.src = this.image.src || this.image || '';
 			},
-
+			
 			// Method that draws the image to the canvas once it's loaded
 			draw: function () {
 				var canvas = this.core.canvas,
@@ -5030,23 +5030,23 @@
 					x = this.abs_x - origin.x,
 					y = this.abs_y - origin.y,
 					width, height;
-
+				
 				// If the image has finished loading, go on and draw
 				if (this.loaded && this.core.draw.objects[this.zIndex] !== undefined && this.img.width > 0 && this.img.height > 0) {
-
-
+					
+				
 					width = (this.width === 0) ? this.img.width : this.width;
 					height = (this.height === 0) ? this.img.height : this.height;
-
+				
 					if (this.tile) {
-
+					
 						var num_x = Math.ceil(width / this.tile_width),
 							num_y = Math.ceil(height / this.tile_height),
 							tile_x, tile_y;
-
+						
 						canvas.save();
 						canvas.beginPath();
-
+						
 						// Create clipping path for the rectangle that the tiled images will be drawn inside
 						canvas.moveTo(x, y);
 						canvas.lineTo(x + width, y);
@@ -5054,7 +5054,7 @@
 						canvas.lineTo(x, y + height);
 						canvas.lineTo(x, y);
 						canvas.clip();
-
+						
 						// Draw all the tiled images
 						for (tile_y = 0; tile_y < num_y; tile_y++) {
 							for (tile_x = 0; tile_x < num_x; tile_x++) {
@@ -5065,28 +5065,28 @@
 						canvas.closePath();
 						canvas.restore();
 
-
+						
 					} else {
-
+				
 						// Draw the image to the canvas
 						canvas.drawImage(this.img, x, y, width, height);
-
+						
 					}
-
+					
 					// Do color if stroke width is specified
 					if (this.strokeWidth > 0) {
 						canvas.lineWidth = this.strokeWidth;
 						canvas.strokeStyle = this.strokeColor;
 						canvas.strokeRect(x, y, width, height);
 					}
-
+					
 					// Clear the timer if this is the first time it is drawn
 					if (this.firstDrawn === false) {
 						this.firstDrawn = true;
 						clearTimeout(this.loadtimer);
 					}
 				}
-
+				
 				// If the image hasn't finished loading, set a timer and try again
 				else {
 					clearTimeout(this.loadtimer);
@@ -5096,16 +5096,16 @@
 				}
 
 				this._.hasBeenDrawn = true;
-
+				
 				return this;
 			}
-
+			
 		}, settings);
 	};
-
+	
 	// Register the display object
 	oCanvas.registerDisplayObject("image", image, "init");
-
+	
 
 
 
@@ -5114,7 +5114,7 @@
 
 	// Define the class
 	var text = function (settings, thecore) {
-
+	
 		// Method for setting a font property. Updates both obj.font and obj.property
 		var setFontProperty = function (_this, property, value, objectProperty, thecore) {
 			var font = thecore.style.getFont(_this.font);
@@ -5127,13 +5127,13 @@
 				_this._[objectProperty] = value;
 			}
 		};
-
+		
 		// Return an object when instantiated
 		return oCanvas.extend({
 			core: thecore,
-
+			
 			shapeType: "rectangular",
-
+			
 			// Default properties
 			align: "start",
 			baseline: "top",
@@ -5151,15 +5151,15 @@
 				height: 0,
 				lines: []
 			}),
-
+			
 			// Setters for font properties
 			set font (value) {
-
+			
 				// Convert the value to a correct string if it is not a string
 				if (typeof value !== "string") {
 					value = this.core.style.getFont(value, "string");
 				}
-
+				
 				// Get font object and set styles
 				var font = this.core.style.getFont(value);
 				value = this.core.style.getFont(font, "string");
@@ -5171,7 +5171,7 @@
 				this._.lineHeightUnit = font.lineHeightUnit;
 				this._.family = font.family;
 				this._.font = value;
-
+				
 				this.initWebFont();
 				this.setDimensions();
 			},
@@ -5213,7 +5213,7 @@
 			set height (value) {
 				return;
 			},
-
+			
 			// Getters for font properties
 			get font () {
 				return this._.font;
@@ -5245,21 +5245,21 @@
 			get height () {
 				return this._.height;
 			},
-
+			
 			// Method for initializing the text and get dimensions
 			init: function () {
 				this._.initialized = true;
 				this.initWebFont();
 				this.setDimensions();
 			},
-
+			
 			// Method for setting width/height when something has changed
 			setDimensions: function () {
 				if (this._.initialized) {
 					var canvas, textLines, numLines, lineHeight, width, height, i, metrics, lines;
 
 					canvas = this.core.canvas;
-
+					
 					// Set the text settings
 					canvas.fillStyle = this.fill;
 					canvas.font = this.font;
@@ -5268,7 +5268,7 @@
 					width = 0;
 					height = 0;
 					lines = [];
-
+					
 					// Get the dimensions of all lines
 					for (i = 0; i < numLines; i++) {
 						metrics = canvas.measureText(textLines[i]);
@@ -5304,7 +5304,7 @@
 				var self = this;
 				var core = this.core,
 					dummy;
-
+				
 				// Create a dummy element and set the current font
 				dummy = document.createElement("span");
 				dummy.style.font = font;
@@ -5331,7 +5331,7 @@
 
 				return aligns[this.align] || 0;
 			},
-
+			
 			getBaselineOffset: function () {
 				var baselines = {
 					"top":         this.size *  0.82,
@@ -5344,7 +5344,7 @@
 
 				return baselines[this.baseline] || 0;
 			},
-
+			
 			// Method for drawing the object to the canvas
 			draw: function () {
 				var canvas, lines, alignOffset, baselineOffset, relativeLineHeight, lineHeightOffset, origin, x, y, i, numLines;
@@ -5360,13 +5360,13 @@
 				origin = this.getOrigin();
 				x = this.abs_x - origin.x - alignOffset;
 				y = this.abs_y - origin.y + baselineOffset - lineHeightOffset;
-
+				
 				canvas.beginPath();
-
+				
 				canvas.font = this.font;
 				canvas.textAlign = this.align;
 				canvas.textBaseline = "alphabetic";
-
+				
 				// Draw the text as a stroke if a stroke is specified
 				if (this.strokeWidth > 0) {
 					canvas.lineWidth = this.strokeWidth;
@@ -5377,153 +5377,153 @@
 						canvas.strokeText(lines[i].text, x, y + (i * lines[i].height) + (lines[i].height - this.size) / 2);
 					}
 				}
-
+				
 				// Draw the text normally if a fill color is specified
 				if (this.fill !== "") {
 					canvas.fillStyle = this.fill;
-
+					
 					// Draw the text with support for multiple lines
 					for (i = 0, numLines = lines.length; i < numLines; i++) {
 						canvas.fillText(lines[i].text, x, y + (i * lines[i].height) + (lines[i].height - this.size) / 2);
 					}
 				}
-
+				
 				canvas.closePath();
 
 				this._.hasBeenDrawn = true;
-
+				
 				return this;
 			}
-
+			
 		}, settings);
 	};
-
+	
 	// Register the display object
 	oCanvas.registerDisplayObject("text", text, "init");
-
+	
 
 
 
 
 	// Define the class
 	var arc = function (settings, thecore) {
-
+		
 		// Return an object when instantiated
 		return oCanvas.extend({
 			core: thecore,
-
+			
 			shapeType: "radial",
 			radius: 0,
 			start: 0,
 			end: 0,
 			direction: "clockwise",
 			pieSection: false,
-
+			
 			draw: function () {
 				var canvas = this.core.canvas,
 					origin = this.getOrigin(),
 					x = this.abs_x - origin.x,
 					y = this.abs_y - origin.y;
-
+				
 				// Don't draw if the radius is 0 or less (won't be visible anyway)
 				if (this.radius > 0 && this.start !== this.end) {
-
+				
 					// Draw the arc
 					canvas.beginPath();
 					if (this.pieSection) {
 						canvas.moveTo(x, y);
 					}
 					canvas.arc(x, y, this.radius, this.start * Math.PI / 180, this.end * Math.PI / 180, (this.direction === "anticlockwise"));
-
+					
 					// Do fill
 					if (this.fill !== "") {
 						canvas.fillStyle = this.fill;
 						canvas.fill();
 					}
-
+					
 					// Do stroke
 					if (this.strokeWidth > 0) {
 						canvas.lineWidth = this.strokeWidth;
 						canvas.strokeStyle = this.strokeColor;
 						canvas.stroke();
 					}
-
+					
 					canvas.closePath();
-
+					
 				}
-
+				
 				return this;
 			}
-
+			
 		}, settings);
 	};
-
+	
 	// Register the display object
 	oCanvas.registerDisplayObject("arc", arc);
-
+	
 
 
 
 
 	// Define the class
 	var ellipse = function (settings, thecore) {
-
+		
 		// Return an object when instantiated
 		return oCanvas.extend({
 			core: thecore,
-
+			
 			shapeType: "radial",
-
+			
 			_: oCanvas.extend({}, thecore.displayObject._, {
 				radius_x: 0,
 				radius_y: 0
 			}),
-
+			
 			set radius (value) {
 				this._.radius_x = value;
 				this._.radius_y = value;
 			},
-
+			
 			set radius_x (value) {
 				this._.radius_x = value;
 			},
-
+			
 			set radius_y (value) {
 				this._.radius_y = value;
 			},
-
+			
 			get radius () {
 				return this._.radius_x;
 			},
-
+			
 			get radius_x () {
 				return this._.radius_x;
 			},
-
+			
 			get radius_y () {
 				return this._.radius_y;
 			},
-
+			
 			draw: function () {
 				var canvas = this.core.canvas,
 					origin = this.getOrigin(),
 					x = this.abs_x - origin.x,
 					y = this.abs_y - origin.y;
-
+				
 				canvas.beginPath();
-
+				
 				// Draw a perfect circle with the arc method if both radii are the same
 				if (this.radius_x === this.radius_y) {
 					canvas.arc(x, y, this.radius_x, 0, Math.PI * 2, false);
 				}
-
+				
 				// Draw an ellipse if the radii are not the same
 				else {
-
+					
 					// Calculate values for the ellipse
 					var EllipseToBezierConstant = 0.276142374915397,
 						o = {x: this.radius_x * 2 * EllipseToBezierConstant, y: this.radius_y * 2 * EllipseToBezierConstant};
-
+					
 					// Draw the curves that will form the ellipse
 					canvas.moveTo(x - this.radius_x, y);
 					canvas.bezierCurveTo(x - this.radius_x, y - o.y, x - o.x, y - this.radius_y, x, y - this.radius_y);
@@ -5531,68 +5531,68 @@
 					canvas.bezierCurveTo(x + this.radius_x, y + o.y, x + o.x, y + this.radius_y, x, y + this.radius_y);
 					canvas.bezierCurveTo(x - o.x, y + this.radius_y, x - this.radius_x, y + o.y, x - this.radius_x, y);
 				}
-
+				
 				// Do fill
 				if (this.fill !== "") {
 					canvas.fillStyle = this.fill;
 					canvas.fill();
 				}
-
+				
 				// Do stroke
 				if (this.strokeWidth > 0) {
 					canvas.lineWidth = this.strokeWidth;
 					canvas.strokeStyle = this.strokeColor;
 					canvas.stroke();
 				}
-
+				
 				canvas.closePath();
-
+				
 				return this;
 			}
-
+			
 		}, settings);
 	};
-
+	
 	// Register the display object
 	oCanvas.registerDisplayObject("ellipse", ellipse);
-
+	
 
 
 
 	// Define the class
 	var polygon = function (settings, thecore) {
-
+		
 		// Return an object when instantiated
 		return oCanvas.extend({
 			core: thecore,
-
+			
 			shapeType: "radial",
-
+			
 			sides: 3,
-
+			
 			_: oCanvas.extend({}, thecore.displayObject._, {
 				radius: 0,
 				side: 0
 			}),
-
+			
 			set radius (value) {
 				this._.radius = value;
 				this._.side = 2 * this._.radius * Math.sin(Math.PI / this.sides);
 			},
-
+			
 			set side (value) {
 				this._.side = value;
 				this._.radius = (this._.side / 2) / Math.sin(Math.PI / this.sides);
 			},
-
+			
 			get radius () {
 				return this._.radius;
 			},
-
+			
 			get side () {
 				return this._.side;
 			},
-
+			
 			draw: function () {
 				var canvas = this.core.canvas,
 					origin = this.getOrigin(),
@@ -5602,13 +5602,13 @@
 					sides = this.sides,
 					radius = this.radius,
 					xPos, yPos, i;
-
+				
 				canvas.beginPath();
-
+				
 				for (i = 0; i <= sides; i++) {
 					xPos = x + radius * Math.cos(i * 2 * Math.PI / sides);
 					yPos = y + radius * Math.sin(i * 2 * Math.PI / sides);
-
+					
 					if (i === 0) {
 						canvas.moveTo(xPos, yPos);
 						firstPoint = { x: xPos, y: yPos };
@@ -5619,42 +5619,42 @@
 						canvas.lineTo(xPos, yPos);
 					}
 				}
-
+				
 				canvas.closePath();
-
+				
 				if (this.fill !== "") {
 					canvas.fillStyle = this.fill;
 					canvas.fill();
 				}
-
-
+				
+				
 				if (this.strokeWidth > 0) {
 					canvas.lineWidth = this.strokeWidth;
 					canvas.strokeStyle = this.strokeColor;
 					canvas.stroke();
 				}
-
+				
 				return this;
 			}
-
+			
 		}, settings);
 	};
-
+	
 	// Register the display object
 	oCanvas.registerDisplayObject("polygon", polygon);
-
+	
 
 
 
 	// Define the class
 	var line = function (settings, thecore) {
-
+		
 		// Return an object when instantiated
 		return oCanvas.extend({
 			core: thecore,
-
+			
 			shapeType: "radial",
-
+			
 			// Properties
 			_: oCanvas.extend({}, thecore.displayObject._, {
 				start_x: 0,
@@ -5667,7 +5667,7 @@
 				abs_y: 0
 			}),
 			children: [],
-
+			
 			// Getters and setters
 			set start (values) {
 				this._.start_x = values.x + (this.parent && !this.parent.isCore ? this.parent._.abs_x : 0);
@@ -5719,7 +5719,7 @@
 					}
 				};
 			},
-
+			
 			// Overwrite the setters that displayObject provides, to enable start/end coordinates to affect the position
 			set x (value) {
 				var diff, offsetX, objects, l, i;
@@ -5729,15 +5729,15 @@
 
 				// Get parent offset
 				offsetX = this.parent && !this.parent.isCore ? this.parent._.abs_x : 0;
-
+				
 				// Assign new x positions for the object
 				this._.x = value;
 				this._.abs_x = value + offsetX;
-
+				
 				// Assign new x positions for start and end points
 				this._.start_x = value - (diff / 2) + offsetX;
 				this._.end_x = value + (diff / 2) + offsetX;
-
+				
 				// Update children
 				objects = this.children;
 				l = objects.length;
@@ -5751,18 +5751,18 @@
 
 				// Get delta length
 				diff = this._.end_y - this._.start_y,
-
+				
 				// Get parent offset
 				offsetY = this.parent && !this.parent.isCore ? this.parent._.abs_y : 0;
-
+				
 				// Assign new y positions for the object
 				this._.y = value;
 				this._.abs_y = value + offsetY;
-
+				
 				// Assign new y positions for start and end points
 				this._.start_y = value - (diff / 2) + offsetY;
 				this._.end_y = value + (diff / 2) + offsetY;
-
+				
 				// Update children
 				objects = this.children;
 				l = objects.length;
@@ -5777,16 +5777,16 @@
 			get y () {
 				return this._.y;
 			},
-
+			
 			set length (value) {
 				var dX, dY, length, angle;
-
+				
 				// Find current length and angle
 				dX = Math.abs(this._.end_x - this._.start_x);
 				dY = Math.abs(this._.end_y - this._.start_y);
 				length = Math.sqrt(dX * dX + dY * dY);
 				angle = Math.asin(dX / length);
-
+				
 				// Calculate new values
 				dX = Math.sin(angle) * value;
 				dY = Math.cos(angle) * value;
@@ -5799,21 +5799,21 @@
 			},
 			get length () {
 				var dX, dY, length;
-
+				
 				dX = Math.abs(this._.end_x - this._.start_x);
 				dY = Math.abs(this._.end_y - this._.start_y);
 				length = Math.sqrt(dX * dX + dY * dY);
-
+				
 				return length;
 			},
-
+			
 			set radius (value) {
 				this.length = value * 2;
 			},
 			get radius () {
 				return this.length / 2;
 			},
-
+			
 			// Method for setting x/y coordinates (which will set abs_x/abs_y as specified by displayObject)
 			setPosition: function () {
 				var offset = { x: 0, y: 0 };
@@ -5824,19 +5824,19 @@
 				this.x = this._.start_x - offset.x + (this._.end_x - this._.start_x) / 2;
 				this.y = this._.start_y - offset.y + (this._.end_y - this._.start_y) / 2;
 			},
-
+			
 			// Method for initializing the dimensions
 			init: function () {
 				this.initialized = true;
 				this.setPosition();
 			},
-
+			
 			draw: function () {
 				var canvas = this.core.canvas,
 					origin = this.getOrigin(),
 					translation = this.core.draw.translation;
-
-
+				
+				
 				canvas.lineWidth = this.strokeWidth;
 				canvas.strokeStyle = this.strokeColor;
 				canvas.beginPath();
@@ -5844,27 +5844,27 @@
 				canvas.lineTo(this._.end_x - translation.x - origin.x, this._.end_y - translation.y - origin.y);
 				canvas.stroke();
 				canvas.closePath();
-
+				
 				return this;
 			}
-
+			
 		}, settings);
 	};
-
+	
 	// Register the display object
 	oCanvas.registerDisplayObject("line", line, "init");
-
+	
 
 
 
 
 	// Define the class
 	var sprite = function (settings, thecore) {
-
+		
 		// Return an object when instantiated
 		return oCanvas.extend({
 			core: thecore,
-
+			
 			// Set properties
 			shapeType: "rectangular",
 			loaded: false,
@@ -5880,47 +5880,47 @@
 			running: false,
 			active: false,
 			loop: true,
-
+			
 			_: oCanvas.extend({}, thecore.displayObject._, {
 				autostart: false
 			}),
-
+			
 			set autostart (value) {
 				this.active = value;
 				this._.autostart = value;
 			},
-
+			
 			get autostart () {
 				return this._.autostart;
 			},
-
+			
 			// Init method for loading the image resource
 			init: function () {
 				if (this.image === undefined) {
 					return;
 				}
 				var _this = this,
-
+				
 					// Get source (settings.image can be either an HTML img element or a string with path to the image)
 					source = (this.image.nodeName && this.image.nodeName.toLowerCase() === "img") ? "htmlImg" : "newImg";
-
+				
 				// Get image object (either create a copy of the current element, or a new image)
 				this.img = (source === "htmlImg") ? this.image.cloneNode(false) : new Image();
-
+				
 				// Temporarily append it to the canvas to be able to get dimensions
 				this.core.canvasElement.appendChild(this.img);
-
+				
 				// Get dimensions when the image is loaded. Also, remove the temp img from DOM
 				this.img.onload = function () {
-
+				
 					// Set the full source image dimensions
 					_this.full_width = this.width;
 					_this.full_height = this.height;
-
+					
 					// If automatic generation is specified
 					if (_this.generate) {
 						var dir, length_full, length_cropped, num_frames, i;
-
+					
 						// Get frame data
 						dir = _this.direction;
 						length_full = (dir === "y") ? _this.full_height : _this.full_width;
@@ -5932,7 +5932,7 @@
 							num_frames = length_full / length_cropped;
 							_this.numFrames = num_frames;
 						}
-
+						
 						// Create frames based on the specified width, height, direction, offset and duration
 						_this.frames = [];
 						for (i = 0; i < num_frames; i++) {
@@ -5947,13 +5947,13 @@
 					_this.loaded = true;
 					_this.core.redraw();
 				};
-
+				
 				// Set the path to the image if a string was passed in
 				if (source === "newImg") {
 					this.img.src = this.image;
 				}
 			},
-
+			
 			draw: function () {
 				var _this = this,
 					canvas = this.core.canvas,
@@ -5961,13 +5961,13 @@
 					x = this.abs_x - origin.x,
 					y = this.abs_y - origin.y,
 					frame;
-
+				
 				// If the image has finished loading, go on and draw
 				if (this.loaded) {
-
+				
 					// Draw current frame
 					if (this.frames.length > 0) {
-
+					
 						// Get current frame
 						if (this.frame > this.frames.length) {
 							return this;
@@ -5975,51 +5975,51 @@
 						frame = this.frames[this.frame - 1];
 						frame_width = (frame.w !== undefined) ? frame.w : this.width;
 						frame_height = (frame.h !== undefined) ? frame.h : this.height;
-
+						
 						// Draw the current sprite part
 						canvas.drawImage(this.img, frame.x, frame.y, frame_width, frame_height, x, y, frame_width, frame_height);
-
+						
 						// Do stroke if stroke width is specified
 						if (this.strokeWidth > 0) {
 							canvas.lineWidth = this.strokeWidth;
 							canvas.strokeStyle = this.strokeColor;
 							canvas.strokeRect(x, y, frame_width, frame_height);
 						}
-
+						
 						// Set a redraw timer at the current frame duration if a timer is not already running
 						if (this.running === false && this.active) {
-
+						
 							setTimeout(function () {
-
+							
 								// Increment the frame number only after the frame duration has passed
 								if (_this.loop) {
 									_this.frame = (_this.frame === _this.frames.length) ? 1 : _this.frame + 1;
 								} else {
 									_this.frame = (_this.frame === _this.frames.length) ? _this.frame : _this.frame + 1;
 								}
-
+								
 								// Set timer status
 								_this.running = false;
-
+								
 								// Redraw canvas if the timeline is not running
 								if (!_this.core.timeline.running) {
 									_this.core.draw.redraw();
 								}
-
+								
 							}, frame.d);
-
+							
 							// Set timer status
 							this.running = true;
 						}
 					}
-
+					
 					// Clear the timer if this is the first time it is drawn
 					if (this.firstDrawn === false) {
 						this.firstDrawn = true;
 						clearTimeout(this.loadtimer);
 					}
 				}
-
+				
 				// If the image hasn't finished loading, set a timer and try again
 				else {
 					clearTimeout(this.loadtimer);
@@ -6027,10 +6027,10 @@
 						_this.draw();
 					}, 100);
 				}
-
+				
 				return this;
 			},
-
+			
 			start: function () {
 				this.startAnimation();
 
@@ -6040,36 +6040,36 @@
 			startAnimation: function () {
 				this.active = true;
 				this.core.redraw();
-
+				
 				return this;
 			},
-
+			
 			stopAnimation: function () {
 				this.active = false;
-
+				
 				return this;
 			},
-
+			
 		}, settings);
 	};
-
+	
 	// Register the display object
 	oCanvas.registerDisplayObject("sprite", sprite, "init");
-
+	
 
 
 })(window, document);
 /*
  * Xccessors Standard: Cross-browser ECMAScript 5 accessors
  * http://purl.eligrey.com/github/Xccessors
- *
+ * 
  * 2010-06-21
  * By Eli Grey, http://eligrey.com
- *
+ * 
  * A shim that partially implements Object.defineProperty,
  * Object.getOwnPropertyDescriptor, and Object.defineProperties in browsers that have
  * legacy __(define|lookup)[GS]etter__ support.
- *
+ * 
  * Licensed under the X11/MIT License
  * Copyright © 2010 Elijah Grey, who also goes by Eli Grey.
  *
@@ -6098,7 +6098,7 @@
 	lookupGetter = ObjectProto.__lookupGetter__,
 	lookupSetter = ObjectProto.__lookupSetter__,
 	hasOwnProp = ObjectProto.hasOwnProperty;
-
+	
 	if (defineGetter && defineSetter && lookupGetter && lookupSetter) {
 
 		if (!Object.defineProperty) {
@@ -6106,7 +6106,7 @@
 				if (arguments.length < 3) { // all arguments required
 					throw new TypeError("Arguments not optional");
 				}
-
+				
 				prop += ""; // convert prop to string
 
 				if (hasOwnProp.call(descriptor, "value")) {
@@ -6116,20 +6116,20 @@
 					}
 
 					if ((hasOwnProp.call(descriptor, "get") ||
-					     hasOwnProp.call(descriptor, "set")))
+					     hasOwnProp.call(descriptor, "set"))) 
 					{
 						// descriptor has a value prop but accessor already exists
 						throw new TypeError("Cannot specify an accessor and a value");
 					}
 				}
-
+				
 				if (descriptor.get) {
 					defineGetter.call(obj, prop, descriptor.get);
 				}
 				if (descriptor.set) {
 					defineSetter.call(obj, prop, descriptor.set);
 				}
-
+			
 				return obj;
 			};
 		}
@@ -6139,7 +6139,7 @@
 				if (arguments.length < 2) { // all arguments required
 					throw new TypeError("Arguments not optional.");
 				}
-
+				
 				prop += ""; // convert prop to string
 
 				var descriptor = {
@@ -6163,14 +6163,14 @@
 				// populate descriptor.get and descriptor.set (IE's behavior)
 				delete descriptor.writable;
 				descriptor.get = descriptor.set = undefined;
-
+				
 				if (getter) {
 					descriptor.get = getter;
 				}
 				if (setter) {
 					descriptor.set = setter;
 				}
-
+				
 				return descriptor;
 			};
 		}
