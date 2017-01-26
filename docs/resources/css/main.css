@@ -1,0 +1,52 @@
+html,
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background-color: rgba(0, 0, 0, 0.01);
+}
+
+body {
+  min-height: 200%;
+}
+
+.container {
+  position: absolute;
+  z-index: 100;
+  margin-top: 25%;
+  margin-bottom: 75%;
+  margin-left: 10%;
+  margin-right: 10%;
+  background-color: rgba(255, 255, 255, 0.7);
+  width: 80%;
+  border-radius: 5px;
+  border: 1px solid white;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+.container .inner {
+  margin: 1em;
+}
+
+canvas {
+  display: block;
+}
+
+#hexagonif-container {
+  position: fixed;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 1px solid lightgrey;
+}
+
+#hexagonif {
+  width: 100%;
+  height: 100%;
+}
