@@ -19,7 +19,7 @@ function integer(from, to) {
 
 var api = {
     floatingPoint: floatingPoint,
-    integer: integer
-}
+    integer: integer,
+};
 
 module.exports = api;

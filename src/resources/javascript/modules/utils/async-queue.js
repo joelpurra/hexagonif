@@ -3,11 +3,11 @@ function noop() {}
 function asyncExecute(fn) {
     setTimeout(function() {
         fn.call(null);
-    }.bind(this), 0);
+    }, 0);
 }
 
 function assertFunction(fn) {
-    if (typeof(fn) !== "function") {
+    if (typeof (fn) !== "function") {
         throw new Error("Not a function");
     }
 }
@@ -27,7 +27,7 @@ AsyncQueue.prototype.add = function(fn) {
     this.queue.push(fn);
 
     this.consume();
-}
+};
 
 AsyncQueue.prototype.consume = function() {
     if (this.parallel < this.limit) {
@@ -48,6 +48,6 @@ AsyncQueue.prototype.consume = function() {
             done && asyncExecute(done);
         }
     }
-}
+};
 
 module.exports = AsyncQueue;

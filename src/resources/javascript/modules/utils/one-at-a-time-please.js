@@ -9,7 +9,7 @@ function oneAtATimePlease(fn) {
             fn.call(null);
 
             running = false;
-        }
+        };
 
     return wrapper;
 }

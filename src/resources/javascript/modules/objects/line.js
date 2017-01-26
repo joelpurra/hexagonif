@@ -17,7 +17,7 @@ Line.prototype._getCacheKey = function() {
     if (start < end) {
         result = start + "-" + end;
     } else {
-        result = end + "-" + start
+        result = end + "-" + start;
     }
 
     return result;

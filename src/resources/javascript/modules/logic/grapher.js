@@ -55,7 +55,7 @@ function getOrGenerateHexagon(cache, hexagonSideLength, startPoint, startCorner)
         corner = nextCorner;
 
         // TODO: fix equality check
-    } while (corner.rotation !== startCorner.rotation)
+    } while (corner.rotation !== startCorner.rotation);
 
     // Hexagon
     {
@@ -102,7 +102,7 @@ function addNeighbors(gonif) {
     while (side = sidesToCheck.shift()) {
         var neighbor = gonif.getNeighbor(side);
 
-        if (!!neighbor) {
+        if (neighbor) {
             var sharedNeighborDirections = Gonif.Neighbors.getSharedNeighborDirections(side);
 
             sharedNeighborDirections.forEach(function(sharedNeighborDirection) {
@@ -142,7 +142,7 @@ function generateGonifInDirection(area, cache, hexagonSideLength, gonif, goingTo
         goingTowardsDirectionIndex = (goingTowardsDirectionIndex + 1) % goingTowardsDirections.length;
         goingTowardsDirection = goingTowardsDirections[goingTowardsDirectionIndex];
         gonif = neighbor;
-    } while (area.isInside(startPoint))
+    } while (area.isInside(startPoint));
 }
 
 function generateGraph(area, cache, hexagonSideLength) {
@@ -164,18 +164,18 @@ function generateGraph(area, cache, hexagonSideLength) {
         generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.Top);
         generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.Bottom);
         gonif = gonif.getNeighbor(Hexagon.Sides.BottomRight) || gonif.getNeighbor(Hexagon.Sides.TopRight);
-    } while (!!gonif);
+    } while (gonif);
 
     // Start from left neighbor of the first gonif.
     gonif = startGonif.getNeighbor(Hexagon.Sides.BottomLeft) || startGonif.getNeighbor(Hexagon.Sides.TopLeft);
 
     // Generate based on neighbors to the west.
-    if (!!gonif) {
+    if (gonif) {
         do {
             generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.Top);
             generateGonifInDirection(areaWithPadding, cache, hexagonSideLength, gonif, Hexagon.Sides.Bottom);
             gonif = gonif.getNeighbor(Hexagon.Sides.BottomLeft) || gonif.getNeighbor(Hexagon.Sides.TopLeft);
-        } while (!!gonif);
+        } while (gonif);
     }
 
     return startGonif;

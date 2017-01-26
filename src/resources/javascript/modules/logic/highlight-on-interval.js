@@ -26,13 +26,13 @@ function HighlightOnInterval(scene, graphObjectsTool, hexEvent) {
 
 HighlightOnInterval.prototype.highlightCounterDecreaser = function() {
     this.highlightCounter = Math.max(0, this.highlightCounter - 1);
-}
+};
 
 HighlightOnInterval.prototype.resetRandomLine = function() {
     var line = this.graphObjectsTool.getRandomLine();
 
     this.scene.resetLine(line);
-}
+};
 
 HighlightOnInterval.prototype.highlightRandomLine = function() {
     var line = this.graphObjectsTool.getRandomLine();
@@ -44,14 +44,14 @@ HighlightOnInterval.prototype.highlightRandomLine = function() {
     setTimeout(function unhighlightSameRandomLine() {
         this.scene.unhighlightLine(line);
     }.bind(this), this.unhighlightAfterMilliseconds);
-}
+};
 
 HighlightOnInterval.prototype.highlightRandomHexagon = function() {
     var hexagon;
 
     do {
         hexagon = this.graphObjectsTool.getRandomHexagon();
-    } while (!hexagon.isComplete())
+    } while (!hexagon.isComplete());
 
     this.isAutomatedHighlight = true;
     this.scene.highlightHexagon(hexagon);
@@ -60,7 +60,7 @@ HighlightOnInterval.prototype.highlightRandomHexagon = function() {
     setTimeout(function unhighlightSameRandomHexagon() {
         this.scene.unhighlightHexagon(hexagon);
     }.bind(this), this.unhighlightAfterMilliseconds);
-}
+};
 
 HighlightOnInterval.prototype.highlightSomethingThatIfNothingHasHappened = function() {
     var rnd = random.integer(10);
@@ -74,25 +74,25 @@ HighlightOnInterval.prototype.highlightSomethingThatIfNothingHasHappened = funct
             this.highlightRandomHexagon();
         }
     }
-}
+};
 
 HighlightOnInterval.prototype.hexagonifLineHighlightEventListener = function() {
     if (!this.isAutomatedHighlight) {
         this.highlightCounter = Math.min(Number.MAX_VALUE - 1, this.highlightCounter + 1, MAX_AUTO_HIGHLIGHT_DELAY);
     }
-}
+};
 
 HighlightOnInterval.prototype.hexagonifLineUnhighlightEventListener = function() {
     // Something
-}
+};
 
 HighlightOnInterval.prototype.isStarted = function() {
     return this.isHighlighterStarted == true;
-}
+};
 
 HighlightOnInterval.prototype.start = function() {
     if (this.isStarted()) {
-        throw new Error("Was started.")
+        throw new Error("Was started.");
     }
 
     this.isHighlighterStarted = true;
@@ -102,11 +102,11 @@ HighlightOnInterval.prototype.start = function() {
 
     this.highlightCounterInterval = setInterval(this.boundListeners.highlightCounterDecreaser, this.highlightMilliseconds);
     this.highlightInterval = setInterval(this.boundListeners.highlightSomethingThatIfNothingHasHappened, this.highlightMilliseconds);
-}
+};
 
 HighlightOnInterval.prototype.stop = function() {
     if (!this.isStarted()) {
-        throw new Error("Was not started.")
+        throw new Error("Was not started.");
     }
 
     this.hexEvent.cancel("line.highlight", this.boundListeners.hexagonifLineHighlightEventListener);
@@ -116,6 +116,6 @@ HighlightOnInterval.prototype.stop = function() {
     clearInterval(this.highlightInterval);
 
     this.isHighlighterStarted = false;
-}
+};
 
 module.exports = HighlightOnInterval;

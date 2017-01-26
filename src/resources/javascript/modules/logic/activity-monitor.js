@@ -6,7 +6,7 @@ function ActivityMonitor(hexEvent, limit) {
     this.hexEvent = hexEvent;
     this.limitMilliseconds = limit || 60 * 1000;
 
-	this.checkingIntervalMilliseconds = Math.floor(this.limitMilliseconds / 2);
+    this.checkingIntervalMilliseconds = Math.floor(this.limitMilliseconds / 2);
     this.latestActivityTimestamp = null;
     this.activityInterval = null;
     this.isMonitorStarted = false;
@@ -38,7 +38,7 @@ ActivityMonitor.prototype.checkActivityInterval = function() {
 };
 
 ActivityMonitor.prototype.activityDetected = function() {
-	this.isUserIsActive = true;
+    this.isUserIsActive = true;
     this.resetActivityInterval();
 
     if (this.activityInterval === null) {

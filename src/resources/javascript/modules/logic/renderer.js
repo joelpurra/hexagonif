@@ -12,7 +12,7 @@ function renderer(canvasId, canvasArea, graphObjects) {
     var hexEvent = new HexEvent(canvasElement);
 
     var canvas = oCanvas.create({
-            canvas: "#" + canvasId
+            canvas: "#" + canvasId,
         }),
         graphicsLookupCache = {};
 
@@ -111,13 +111,13 @@ function renderer(canvasId, canvasArea, graphObjects) {
         var line = linePrototype.clone({
             start: {
                 x: start.x,
-                y: start.y
+                y: start.y,
             },
             end: {
                 x: end.x,
-                y: end.y
+                y: end.y,
             },
-            tag: tag
+            tag: tag,
         });
 
         scene.add(line);
@@ -133,10 +133,10 @@ function renderer(canvasId, canvasArea, graphObjects) {
         var gonif = gonifPrototype.clone({
             origin: {
                 x: center.x,
-                y: center.y
+                y: center.y,
             },
             radius: radius,
-            tag: tag
+            tag: tag,
         });
 
         scene.add(gonif);
@@ -207,7 +207,7 @@ function renderer(canvasId, canvasArea, graphObjects) {
             sideLine = hexagon.getSideLine(side);
             fn(sideLine.line);
             side = Hexagon.Sides.next(side);
-        } while (side !== startSide)
+        } while (side !== startSide);
     }
 
     function highlightHexagon(hexagon) {

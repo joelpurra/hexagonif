@@ -18,7 +18,7 @@ GraphObjectsTool.prototype.getRandomHexagon = function() {
     var hexagon = this.getRandomObject(this.graphObjects.hexagons);
 
     return hexagon;
-}
+};
 
 GraphObjectsTool.prototype.getRandomLine = function() {
     var line = this.getRandomObject(this.graphObjects.lines);

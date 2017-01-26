@@ -11,13 +11,13 @@ function wrap(name, fn) {
         console && console.profileEnd && console.profileEnd();
 
         return result;
-    }
+    };
 
     return wrapped;
 }
 
 var api = {
-    wrap: wrap
-}
+    wrap: wrap,
+};
 
 module.exports = api;
