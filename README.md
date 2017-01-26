@@ -31,4 +31,4 @@ open "http://localhost:47333/"
 
 
 
-Copyright (c) 2014, 2015 [hexagonif](https://github.com/joelpurra/hexagonif) by [Joel Purra](https://joelpurra.com/). Licensed under the [GNU Affero General Public License, Version 3 (AGPL-3.0)](https://www.gnu.org/licenses/agpl-3.0.html).
+[hexagonif](https://github.com/joelpurra/hexagonif) Copyright &copy; 2014, 2015, 2016, 2017 [Joel Purra](https://joelpurra.com/). Licensed under the [GNU Affero General Public License, Version 3 (AGPL-3.0)](https://www.gnu.org/licenses/agpl-3.0.html).
