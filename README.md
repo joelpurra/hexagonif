@@ -1,9 +1,25 @@
-# [hexagonif](https://github.com/joelpurra/hexagonif)
+# [hexagonif](https://joelpurra.com/projects/hexagonif/)
 
-Played around with the canvas for use in the background of a website, and ended up with this. In use at [joelpurra.com/projects/hexagonif](https://joelpurra.com/projects/hexagonif/) as a demo.
+[![Screenshot of hexagonif after playing around a while](docs/hexagonif-screenshot.png)](https://joelpurra.com/projects/hexagonif/)
 
-- https://en.wiktionary.org/wiki/hexagon
-- https://en.wiktionary.org/wiki/gonif
+Played around with the HTML5 `<canvas>` element for use in the background of a website, and ended up with this little toy. [Play around with the interactive demo.](https://joelpurra.com/projects/hexagonif/) The name "hexagonif" comes from [hexagon](https://en.wiktionary.org/wiki/hexagon) and [gonif](https://en.wiktionary.org/wiki/gonif).
+
+- [Interactive demo](https://joelpurra.com/projects/hexagonif/)
+- [Source code](https://github.com/joelpurra/hexagonif)
+
+
+
+## Use on your website
+
+If you'd like, you can put hexagonif in the background of your own website, as shown on [joelpurra.com](https://joelpurra.com/). See [`docs/index.html`](docs/index.html) and the list below for examples.
+
+If you do use hexagonif, please link back to [joelpurra.com](https://joelpurra.com/) and this project from your website -- and why not add it to the list below?
+
+
+
+### Sites using hexagonif
+
+- [joelpurra.com](https://joelpurra.com/)
 
 
 
