@@ -1,5 +1,12 @@
 # [hexagonif](https://joelpurra.com/projects/hexagonif/)
 
+<p class="donate">
+  <a href="https://joelpurra.com/donate/proceed/?amount=5&currency=usd"><kbd>Donate $5 now</kbd></a>
+  <a href="https://joelpurra.com/donate/proceed/?amount=25&currency=usd"><kbd>Donate $25 now</kbd></a>
+  <a href="https://joelpurra.com/donate/proceed/?amount=100&currency=usd&invoice=true"><kbd>Donate $100 now</kbd></a>
+  <a href="https://joelpurra.com/donate/"><kbd>More options</kbd></a>
+</p>
+
 [![Screenshot of hexagonif after playing around a while](docs/hexagonif-screenshot.png)](https://joelpurra.com/projects/hexagonif/)
 
 Played around with the HTML5 `<canvas>` element for use in the background of a website, and ended up with this little toy. [Play around with the interactive demo.](https://joelpurra.com/projects/hexagonif/) The name "hexagonif" comes from [hexagon](https://en.wiktionary.org/wiki/hexagon) and [gonif](https://en.wiktionary.org/wiki/gonif).
@@ -47,4 +54,4 @@ open "http://localhost:47333/"
 
 
 
-[hexagonif](https://github.com/joelpurra/hexagonif) Copyright &copy; 2014, 2015, 2016, 2017 [Joel Purra](https://joelpurra.com/). Licensed under the [GNU Affero General Public License, Version 3 (AGPL-3.0)](https://www.gnu.org/licenses/agpl-3.0.html).
+[hexagonif](https://github.com/joelpurra/hexagonif) Copyright &copy; 2014, 2015, 2016, 2017 [Joel Purra](https://joelpurra.com/). Licensed under the [GNU Affero General Public License, Version 3 (AGPL-3.0)](https://www.gnu.org/licenses/agpl-3.0.html). [Your donations are appreciated!](https://joelpurra.com/donate/)
