@@ -9,6 +9,14 @@
 
 [![Screenshot of hexagonif after playing around a while](docs/hexagonif-screenshot.png)](https://joelpurra.com/projects/hexagonif/)
 
+
+
+> ## ⚠️ This project has been archived
+>
+> No future updates are planned. Feel free to continue using it, but expect no support.
+
+
+
 Played around with the HTML5 `<canvas>` element for use in the background of a website, and ended up with this little toy. [Play around with the interactive demo.](https://joelpurra.com/projects/hexagonif/) The name "hexagonif" comes from [hexagon](https://en.wiktionary.org/wiki/hexagon) and [gonif](https://en.wiktionary.org/wiki/gonif).
 
 - [Interactive demo](https://joelpurra.com/projects/hexagonif/)
